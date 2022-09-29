@@ -1,4 +1,4 @@
-# meta-url
-Function to generate metadata from URL
+# metaURL
+Fetch metadata from URL
 
 [Project notes](https://notes.nicolasdeville.com/projects/metaurl/)
