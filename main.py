@@ -177,6 +177,8 @@ def metadata_from_url_selenium(url, v=False):
     linkedin = ''
     tiktok = ''
     countries = ''
+    # title = ''
+    name = ''
 
     chrome_options = ChromeOptions()
     chrome_options.add_argument('--headless')
@@ -198,7 +200,17 @@ def metadata_from_url_selenium(url, v=False):
     
     result = [{x.get('property'): x.get('content')} for x in metas] # list of dicts
     if v:
-        print(f"\n#{get_linenumber()} {result=}")
+        print(f"\n#{get_linenumber()} result:")
+        pp.pprint(result)
+        print()
+
+    for og in result:
+        if 'og:title' in og:
+            title = og['og:title']
+        if 'og:description' in og:
+            description = og['og:description']
+        if 'og:site_name' in og:
+            name = og['og:site_name']
 
     dict_metadata_from_selenium = {
         'emails': emails,
@@ -208,10 +220,13 @@ def metadata_from_url_selenium(url, v=False):
         'linkedin': linkedin,
         'tiktok': tiktok,
         'countries': countries,
-
+        'title': title,
+        'description': description,
+        'name': name,
     }
 
     return dict_metadata_from_selenium
+    
 
 def metadata_from_url_request(url, v=False):
     global name_summary_split
