@@ -21,6 +21,10 @@ from selenium.webdriver import Chrome, ChromeOptions
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 
+import scrapee
+from collections import namedtuple
+import pymsgbox
+
 ### while building / debugging:
 from inspect import currentframe
 def get_linenumber():
@@ -43,12 +47,43 @@ count_row = 0
 
 ### Global Variable
 
-test = False # for testing
+test = True # for testing
 v = True # verbose mode
 
 test_url = os.getenv("test_url") # to avoid pushing test url to Github / replace os.getenv with value
 if v:
     print(f"\n#{get_linenumber()} {test_url=}")
+
+### namedtuple to be returned
+meta_url = namedtuple('metaURL', 
+            [
+            'clean_url',  # str
+            'root_website_url', # str
+            'domain', # str
+            'slug', # str
+            'header', # str
+            'title', # str
+            'name', # str
+            'summary', # str
+            'tags', # list
+            'emails', # list
+            'twitter',
+            'facebook',
+            'youtube',
+            'linkedin',
+            'tiktok',
+            'countries', # list
+            'logo', # tbc
+            ]
+            )
+
+# separators between name and description in headers and titles
+name_summary_split = [
+    '|',
+    ':',
+    '-',
+    '·',
+    ]
 
 ### WORKING
 def clean_url(url: str) -> str:
@@ -120,12 +155,7 @@ def metadata_from_url_request(url, v=False):
 
 def name_from_metadata(metadata):
 
-    name_summary_split = [
-    '|',
-    ':',
-    '-',
-    '·',
-    ]
+    
 
     ### TODO need to rework this
     for split_char in name_summary_split:
@@ -139,6 +169,15 @@ def metadata_from_url_selenium(url, v=False):
     if v:
         print(f"\n#{get_linenumber()} starting metadata_from_url_selenium with {url}")
 
+    # empty placeholders / to ensure return if fail
+    emails = ''
+    twitter = ''
+    facebook = ''
+    youtube = ''
+    linkedin = ''
+    tiktok = ''
+    countries = ''
+
     chrome_options = ChromeOptions()
     chrome_options.add_argument('--headless')
 
@@ -146,25 +185,143 @@ def metadata_from_url_selenium(url, v=False):
     web = Chrome(service=s,options=chrome_options)
     web.get(url)
     xml = web.page_source
-    if test:
-        print(f"\n#{get_linenumber()} {xml=}")
+    # if test:
+    #     print(f"\n#{get_linenumber()} {xml=}")
     web.quit()
     soup = BeautifulSoup(xml, features='html.parser')
-    if test:
-        print(f"\n#{get_linenumber()} {soup=}")
+    # if test:
+    #     print(f"\n#{get_linenumber()} {soup=}")
     metas = [x for x in soup.find_all('meta') if x.get('property')]
     if v:
         print(f"\n#{get_linenumber()} metas:\n")
         pp.pprint(metas)
     
-    return [{x.get('property'): x.get('content')} for x in metas] # list of dicts
+    result = [{x.get('property'): x.get('content')} for x in metas] # list of dicts
+    if v:
+        print(f"\n#{get_linenumber()} {result=}")
 
-output = metadata_from_url_selenium(test_url, v=v)
+    dict_metadata_from_selenium = {
+        'emails': emails,
+        'twitter': twitter,
+        'facebook': facebook,
+        'youtube': youtube,
+        'linkedin': linkedin,
+        'tiktok': tiktok,
+        'countries': countries,
+
+    }
+
+    return dict_metadata_from_selenium
+
+def metadata_from_url_request(url, v=False):
+    global name_summary_split
+    header = ''
+    title = ''
+    domain = domain_from_url(url)
+    try:
+        html = request.urlopen(url).read().decode('utf8')
+        # if test:
+        #     print(f"\n{html=}")
+
+        try:
+            soup = BeautifulSoup(html, "html.parser")
+            # if test:
+            #     print(f"\n{soup=}")
+
+            try:
+                title = soup.title.text
+                if '\n' in title:
+                    title = title.replace('\n', ' ').strip()
+                raw_title = title
+                if v:
+                    print(f"\n{get_linenumber()} {title=}")
+
+                try:
+                    header = soup.find('h1').text
+                    if '\n' in header:
+                        header = header.replace('\n', ' ').strip()
+                    if v:
+                        print(f"{get_linenumber()} {header=}")
+                    if header in title:
+                        header = domain
+                    name = title
+                    summary = header
+                    for split_char in name_summary_split:
+                        if split_char in name:
+                            parts = name.split(split_char)
+                            name = parts[0].strip()
+                            summary = parts[1].strip()
+                    if v:
+                        print(f"{get_linenumber()} {name=}")
+                        print(f"{get_linenumber()} {summary=}")
+
+                except Exception as e:
+                    print(f"\n{get_linenumber()} h1 ERROR: {e}")
+                    name = title
+            
+            except Exception as e:
+                print(f"\n{get_linenumber()} title ERROR: {e}")
+
+        except Exception as e:
+            print(f"\n{get_linenumber()} soup ERROR: {e}")
+
+    except Exception as e:
+        print(f"\n{get_linenumber()} html ERROR: {e}")
+    
+    dict_metadata_from_request = {
+        'header': header,
+        'title': title,
+    }
+
+    return dict_metadata_from_request
+
+def meta(url, v=False):
+    global meta_url
+    global name_summary_split
+    url = url.strip()
+    if url.startswith('http'):
+
+        metadata = metadata_from_url_selenium(url)
+
+        output = meta_url(
+            clean_url = clean_url(url),
+            root_website_url = root_url(url),
+            domain = domain_from_url(url),
+            slug = slug_from_url(url),
+            header = metadata_from_url_request(url, v)['header'],
+            title = metadata_from_url_request(url, v)['title'],
+            name = '',
+            summary = '',
+            tags = '',
+            emails = metadata_from_url_selenium(url, v)['emails'],
+            twitter = metadata_from_url_selenium(url, v)['twitter'],
+            facebook = metadata_from_url_selenium(url, v)['facebook'],
+            youtube = metadata_from_url_selenium(url, v)['youtube'],
+            linkedin = metadata_from_url_selenium(url, v)['linkedin'],
+            tiktok = metadata_from_url_selenium(url, v)['tiktok'],
+            countries = metadata_from_url_selenium(url, v)['countries'],
+            logo = '', # type tbc
+            )
+
+        if v:
+            print(f"\n#{get_linenumber()} {output=}")
+
+        return output
+
+    else:
+        msg174 = f"{url} is not a valid URL."
+        print(msg174)
+        pymsgbox.alert(msg174)
 
 
+output = meta(test_url)
 
-print(f"\n#{get_linenumber()} output:\n")
-pp.pprint(output)
+if test:
+    print(f"\n{get_linenumber()} output:\n")
+    pp.pprint(output._asdict())
+    print()
+    print(f"len(output) = {len(output)}")
+    print(f"type(output) = {type(output)}")
 
 ########################################################################################################
 
