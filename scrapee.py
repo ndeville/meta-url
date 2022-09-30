@@ -11,6 +11,20 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 ##############
 import os
+import tldextract
+
+# for pickling soup for tests:
+import pickle
+import sys
+sys.setrecursionlimit(10000)
+
+from inspect import currentframe
+def get_linenumber():
+    """
+    print line numbers with f"{get_linenumber()}"
+    """
+    cf = currentframe()
+    return cf.f_back.f_lineno
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -19,12 +33,20 @@ CHROMEDRIVER = os.environ.get("CHROMEDRIVER")
 s = Service(CHROMEDRIVER)
 # Main function to run with a url
 
+def slug_from_url(url):
+    o = tldextract.extract(url)
+    domain_name = o.domain.lower()
+    if 'www.' in domain_name:
+        domain_name = domain_name.replace('www.','')
+    return domain_name
+
+
 def edits1(word):
     splits     = [(word[:i], word[i:]) for i in range(len(word) + 1)]
     deletes    = [a + b[1:] for a, b in splits if b]
     return set(deletes)
 
-def scrapee_homepage(url):
+def scrapee_homepage(url, v=False, test=False):
     
     email_regex= "([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
 
@@ -38,37 +60,59 @@ def scrapee_homepage(url):
 
     }
 
-    try:
-        print("Crawling site: ",url)
-        opts = webdriver.ChromeOptions()
-        opts.add_argument("start-maximized") #// https://stackoverflow.com/a/26283818/1689770
-        opts.add_argument("enable-automation")# // https://stackoverflow.com/a/43840128/1689770
-        opts.add_argument("--headless") #// only if you are ACTUALLY running headless
-        opts.add_argument("--no-sandbox")# //https://stackoverflow.com/a/50725918/1689770
-        opts.add_argument("--disable-infobars")# //https://stackoverflow.com/a/43840128/1689770
-        opts.add_argument("--disable-dev-shm-usage")# //https://stackoverflow.com/a/50725918/1689770
-        opts.add_argument("--disable-browser-side-navigation")# //https://stackoverflow.com/a/49123152/1689770
-        opts.add_argument("--disable-gpu")# //https://stackoverflow.com/questions/51959986/how-to-solve-selenium-chromedriver-timed-out-receiving-message-from-renderer-exc
-        opts.add_argument('--log-level=3')
-        opts.add_experimental_option('excludeSwitches', ['enable-logging'])
-        driver = webdriver.Chrome(service=s,options=opts)
-        driver.set_page_load_timeout(20)
+    print(f"\nscrapee_homepage test = {test}\n")
 
-        driver.get(url)
-        htmltext = driver.page_source
-        soup = BeautifulSoup(htmltext, 'html.parser')
-        templinks = []
-        links = []
-        driver.close()
-        driver.quit()
-    except:
-        print("Error Crawling Site: ", url)
-        driver.close()
-        driver.quit()
-        return final
+    templinks = []
+    links = []
 
+    if test:
+        pickle_dump_soup = f"test/soup-{slug_from_url(url)}.pkl"
+        print(f"\nscrapee_homepage {get_linenumber()} TEST: LOADING FROM PICKLE FILE: {pickle_dump_soup}\n")
+        soup_backup = open(pickle_dump_soup, "rb")
+        soup = pickle.load(soup_backup)
+        # soup object can now be used after if/else statement
 
-    soup = BeautifulSoup(htmltext, 'html.parser')
+        pickle_dump_htmltext = f"test/htmltext-{slug_from_url(url)}.pkl"
+        print(f"\nscrapee_homepage {get_linenumber()} TEST: LOADING FROM PICKLE FILE: {pickle_dump_htmltext}\n")
+        htmltext_backup = open(pickle_dump_htmltext, "rb")
+        htmltext = pickle.load(htmltext_backup)
+        # htmltext object can now be used after if/else statement
+
+    else:
+        print(f"\nscrapee_homepage {get_linenumber()} RUNNING LIVE SCRAPING OF {url}\n")
+        try:
+            print(f"scrapee_homepage {get_linenumber()} Crawling site: ",url)
+            opts = webdriver.ChromeOptions()
+            opts.add_argument("start-maximized") #// https://stackoverflow.com/a/26283818/1689770
+            opts.add_argument("enable-automation")# // https://stackoverflow.com/a/43840128/1689770
+            opts.add_argument("--headless") #// only if you are ACTUALLY running headless
+            opts.add_argument("--no-sandbox")# //https://stackoverflow.com/a/50725918/1689770
+            opts.add_argument("--disable-infobars")# //https://stackoverflow.com/a/43840128/1689770
+            opts.add_argument("--disable-dev-shm-usage")# //https://stackoverflow.com/a/50725918/1689770
+            opts.add_argument("--disable-browser-side-navigation")# //https://stackoverflow.com/a/49123152/1689770
+            opts.add_argument("--disable-gpu")# //https://stackoverflow.com/questions/51959986/how-to-solve-selenium-chromedriver-timed-out-receiving-message-from-renderer-exc
+            opts.add_argument('--log-level=3')
+            opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+            driver = webdriver.Chrome(service=s,options=opts)
+            driver.set_page_load_timeout(20)
+
+            driver.get(url)
+            htmltext = driver.page_source
+            soup = BeautifulSoup(htmltext, 'html.parser')
+            driver.close()
+            driver.quit()
+        except:
+            print(f"scrapee_homepage {get_linenumber()} Error Crawling Site: ", url)
+            driver.close()
+            driver.quit()
+            return final
+        # soup = BeautifulSoup(htmltext, 'html.parser')
+        # save object as file
+        with open(f"test/soup-{slug_from_url(url)}.pkl", 'wb') as pf:
+            pickle.dump(soup, pf)
+        with open(f"test/htmltext-{slug_from_url(url)}.pkl", 'wb') as pf:
+            pickle.dump(htmltext, pf)
+
     metas = [x for x in soup.find_all('meta')] 
 
     metas2 = [{x.get('name'): x.get('content')} for x in metas ]
@@ -123,7 +167,8 @@ def scrapee_homepage(url):
     final['meta']['title'] = company_title
     final['meta']['description'] = company_desc
 
-    soup = BeautifulSoup(htmltext, 'html.parser').find_all('a')
+    # soup = BeautifulSoup(htmltext, 'html.parser').find_all('a')
+    soup = soup.find_all('a')
     templinks = [str(link.get('href')) for link in soup]
 
     for link in templinks:
@@ -427,6 +472,9 @@ def scrapee_homepage(url):
 
     final['meta']['twitter'] = company_twitter  
 
+    if test:
+        # and soup object gets closed here
+        soup_backup.close()
 
     return final
 
@@ -447,7 +495,7 @@ def scrapee(url,max_error_count,keywords=[]):
     }
 
     try:
-        print("Crawling site: ",url)
+        print(f"scrapee_homepage {get_linenumber()} Crawling site: ",url)
         opts = webdriver.ChromeOptions()
         opts.add_argument("start-maximized") #// https://stackoverflow.com/a/26283818/1689770
         opts.add_argument("enable-automation")# // https://stackoverflow.com/a/43840128/1689770
@@ -469,7 +517,7 @@ def scrapee(url,max_error_count,keywords=[]):
         links = []
 
     except:
-        print("Error Crawling Site: ", url)
+        print(f"scrapee_homepage {get_linenumber()} Error Crawling Site: ", url)
         driver.close()
         driver.quit()
         return final

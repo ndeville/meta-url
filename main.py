@@ -24,7 +24,11 @@ from selenium.webdriver.chrome.service import Service
 import scrapee
 from collections import namedtuple
 import pymsgbox
+import pickle
 
+### while building / debugging:
+from test_urls import test_list
+list_to_test = test_list()
 ### while building / debugging:
 from inspect import currentframe
 def get_linenumber():
@@ -33,26 +37,22 @@ def get_linenumber():
     """
     cf = currentframe()
     return cf.f_back.f_lineno
-
+### while building / debugging:
 def separator(count=50, lines=3, symbol='='):
-    separator = f"{symbol * count}" + '\n'
-    separator = f"\n{separator * lines}"
+    line = f"{symbol * count}" + '\n'
+    separator = f"\n{line * lines}"
     print(separator)
-
+### while building / debugging:
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
-
+### while building / debugging:
 count = 0
 count_row = 0
+# for pickling soup for tests:
+import sys
+sys.setrecursionlimit(10000)
 
-### Global Variable
-
-test = True # for testing
-v = True # verbose mode
-
-test_url = os.getenv("test_url") # to avoid pushing test url to Github / replace os.getenv with value
-if v:
-    print(f"\n#{get_linenumber()} {test_url=}")
+############
 
 ### namedtuple to be returned
 meta_url = namedtuple('metaURL', 
@@ -64,13 +64,13 @@ meta_url = namedtuple('metaURL',
             'header', # str
             'title', # str
             'name', # str
-            'summary', # str
+            'description', # str
             'tags', # list
             'emails', # list
             'twitter',
             'facebook',
             'youtube',
-            'linkedin',
+            # 'linkedin',
             'tiktok',
             'countries', # list
             'logo', # tbc
@@ -90,7 +90,12 @@ def clean_url(url: str) -> str:
     from urllib.parse import urlparse
     purl = urlparse(url)
     scheme = purl.scheme + '://' if purl.scheme else ''
-    return f'{scheme}{purl.netloc}{purl.path}'
+    concatenation = f'{scheme}{purl.netloc}{purl.path}'
+    if concatenation.endswith('/'): # remove trailing slash
+        final_url = concatenation[:-1]
+    else:
+        final_url = concatenation
+    return final_url
 
 ### WORKING
 def root_url(url):
@@ -162,73 +167,108 @@ def name_from_metadata(metadata):
         if split_char in name:
             parts = name.split(split_char)
             name = parts[0].strip()
-            summary = parts[1].strip()
+            title = parts[1].strip()
     print(f"Not done yet")
 
-def metadata_from_url_selenium(url, v=False):
+def metadata_from_url_selenium(url, v=False, test=False):
+
     if v:
         print(f"\n#{get_linenumber()} starting metadata_from_url_selenium with {url}")
 
-    # empty placeholders / to ensure return if fail
-    emails = ''
-    twitter = ''
-    facebook = ''
-    youtube = ''
-    linkedin = ''
-    tiktok = ''
-    countries = ''
-    # title = ''
-    name = ''
+    def process_soup(soup):
 
-    chrome_options = ChromeOptions()
-    chrome_options.add_argument('--headless')
+        # empty placeholders / to ensure return if fail
+        # emails = ''
+        # twitter = ''
+        # facebook = ''
+        # youtube = ''
+        # linkedin = ''
+        # tiktok = ''
+        # countries = ''
+        title = ''
+        name = ''
+        description = ''
 
-    s = Service(driverpath)
-    web = Chrome(service=s,options=chrome_options)
-    web.get(url)
-    xml = web.page_source
-    # if test:
-    #     print(f"\n#{get_linenumber()} {xml=}")
-    web.quit()
-    soup = BeautifulSoup(xml, features='html.parser')
-    # if test:
-    #     print(f"\n#{get_linenumber()} {soup=}")
-    metas = [x for x in soup.find_all('meta') if x.get('property')]
-    if v:
-        print(f"\n#{get_linenumber()} metas:\n")
-        pp.pprint(metas)
-    
-    result = [{x.get('property'): x.get('content')} for x in metas] # list of dicts
-    if v:
-        print(f"\n#{get_linenumber()} result:")
-        pp.pprint(result)
-        print()
+        metas = [x for x in soup.find_all('meta') if x.get('property')]
+        if v:
+            print(f"\n#{get_linenumber()} metas:\n")
+            pp.pprint(metas)
+        
+        result = [{x.get('property'): x.get('content')} for x in metas] # list of dicts
+        if v:
+            print(f"\n#{get_linenumber()} result:")
+            pp.pprint(result)
+            print()
 
-    for og in result:
-        if 'og:title' in og:
-            title = og['og:title']
-        if 'og:description' in og:
-            description = og['og:description']
-        if 'og:site_name' in og:
-            name = og['og:site_name']
+        for og in result:
+            if 'og:title' in og:
+                title = og['og:title']
+            if 'og:description' in og:
+                description = og['og:description']
+            if 'og:site_name' in og:
+                name = og['og:site_name']
 
-    dict_metadata_from_selenium = {
-        'emails': emails,
-        'twitter': twitter,
-        'facebook': facebook,
-        'youtube': youtube,
-        'linkedin': linkedin,
-        'tiktok': tiktok,
-        'countries': countries,
-        'title': title,
-        'description': description,
-        'name': name,
+        dict_metadata_from_selenium = {
+            # 'emails': emails,
+            # 'twitter': twitter,
+            # 'facebook': facebook,
+            # 'youtube': youtube,
+            # 'linkedin': linkedin,
+            # 'tiktok': tiktok,
+            # 'countries': countries,
+            'title': title,
+            'description': description,
+            'name': name,
+        }
+
+        return dict_metadata_from_selenium
+
+    if test:
+        pickle_dump = f"test/soup-{slug_from_url(url)}.pkl"
+        with open(pickle_dump, "rb") as tp:
+            print(f"\n{get_linenumber()} TEST: LOADING FROM PICKLE FILE: {pickle_dump}\n")
+            soup = pickle.load(tp)
+            output = process_soup(soup)
+    else:
+        print(f"\n{get_linenumber()} RUNNING LIVE SCRAPING OF {url}\n")
+        chrome_options = ChromeOptions()
+        chrome_options.add_argument('--headless')
+
+        s = Service(driverpath)
+        web = Chrome(service=s,options=chrome_options)
+        web.get(url)
+        xml = web.page_source
+        # if test:
+        #     print(f"\n#{get_linenumber()} {xml=}")
+        web.quit()
+        soup = BeautifulSoup(xml, features='html.parser')
+
+        # pickle.dump(soup, f"test/soup-{slug_from_url(url)}.pkl")
+        with open(f"test/soup-{slug_from_url(url)}.pkl", 'wb') as pf:
+            pickle.dump(soup, pf)
+
+        output = process_soup(soup)
+
+    return output
+
+def scrape_url(url, v=False, test=False):
+
+    result = scrapee.scrapee_homepage(url, v=v, test=test)
+
+    dict_data_from_scrape = {
+        'emails': result['emails'],
+        'twitter': result['socials']['twitter'],
+        'facebook': result['socials']['facebook'],
+        'youtube': result['socials']['youtube'],
+        # 'linkedin': result['emails'], # need to add logic in scrapee
+        'tiktok': result['socials']['tiktok'],
+        'countries': result['locations'],
     }
 
-    return dict_metadata_from_selenium
-    
+    return dict_data_from_scrape
 
-def metadata_from_url_request(url, v=False):
+
+def metadata_from_url_request(url, v=False, test=False):
     global name_summary_split
     header = ''
     title = ''
@@ -290,31 +330,37 @@ def metadata_from_url_request(url, v=False):
 
     return dict_metadata_from_request
 
-def meta(url, v=False):
+def meta(url, v=False, test=False):
     global meta_url
     global name_summary_split
     url = url.strip()
     if url.startswith('http'):
 
-        metadata = metadata_from_url_selenium(url)
+        print(f"\n{get_linenumber()} meta test = {test}\n")
+
+        metadata = metadata_from_url_selenium(url, v=v, test=test) # name / title / description
+
+        scrape = scrape_url(url, v=v, test=test) # emails / twitter / facebook / youtube / tiktok / countries
+
+        request_result = metadata_from_url_request(url, v=v, test=test) # header / title
 
         output = meta_url(
             clean_url = clean_url(url),
             root_website_url = root_url(url),
             domain = domain_from_url(url),
             slug = slug_from_url(url),
-            header = metadata_from_url_request(url, v)['header'],
-            title = metadata_from_url_request(url, v)['title'],
-            name = '',
-            summary = '',
+            header = request_result['header'],
+            title = metadata['title'],
+            name = metadata['name'],
+            description = metadata['description'],
             tags = '',
-            emails = metadata_from_url_selenium(url, v)['emails'],
-            twitter = metadata_from_url_selenium(url, v)['twitter'],
-            facebook = metadata_from_url_selenium(url, v)['facebook'],
-            youtube = metadata_from_url_selenium(url, v)['youtube'],
-            linkedin = metadata_from_url_selenium(url, v)['linkedin'],
-            tiktok = metadata_from_url_selenium(url, v)['tiktok'],
-            countries = metadata_from_url_selenium(url, v)['countries'],
+            emails = scrape['emails'],
+            twitter = scrape['twitter'],
+            facebook = scrape['facebook'],
+            youtube = scrape['youtube'],
+            # linkedin = metadata_from_url_selenium(url, v)['linkedin'],
+            tiktok = scrape['tiktok'],
+            countries = scrape['countries'],
             logo = '', # type tbc
             )
 
@@ -328,15 +374,47 @@ def meta(url, v=False):
         print(msg174)
         pymsgbox.alert(msg174)
 
+### TESTS
 
-output = meta(test_url)
+### Global Variable
 
-if test:
+test = True # for testing
+v = False # verbose mode
+
+# output = metadata_from_url_selenium(test_url, v=v)
+# output = scrapee.scrapee_homepage(test_url)
+# output = scrapee.scrapee_twitter_from_homepage(test_url)
+# output = scrapee.scrapee(test_url,max_error_count=10)
+
+for url in list_to_test:
+    print(separator())
+    test_url = url
+    print(f"\n#{get_linenumber()} {test_url=}")
+
+    output = meta(test_url, v=v, test=test)
+
     print(f"\n{get_linenumber()} output:\n")
     pp.pprint(output._asdict())
     print()
     print(f"len(output) = {len(output)}")
     print(f"type(output) = {type(output)}")
+    print()
+    print(f"#{get_linenumber()} clean_url \t\t\t{output.clean_url=}")
+    print(f"#{get_linenumber()} root_url \t\t\t{output.root_website_url=}")
+    print(f"#{get_linenumber()} domain_from_url \t\t{output.domain=}")
+    print(f"#{get_linenumber()} slug_from_url \t\t{output.slug=}")
+    print(f"#{get_linenumber()} metadata_from_url_request \t{output.header=}")
+    print(f"#{get_linenumber()} metadata_from_url_selenium {output.title=}")
+    print(f"#{get_linenumber()} metadata_from_url_selenium {output.name=}")
+    print(f"#{get_linenumber()} metadata_from_url_selenium {output.description=}")
+    print(f"#{get_linenumber()} TODO \t\t\t{output.tags=}")
+    print(f"#{get_linenumber()} scrape_url \t\t{output.emails=}")
+    print(f"#{get_linenumber()} scrape_url \t\t{output.twitter=}")
+    print(f"#{get_linenumber()} scrape_url \t\t{output.facebook=}")
+    print(f"#{get_linenumber()} scrape_url \t\t{output.youtube=}")
+    print(f"#{get_linenumber()} scrape_url \t\t{output.tiktok=}")
+    print(f"#{get_linenumber()} scrape_url \t\t{output.countries=}")
+    print(f"#{get_linenumber()} scrape_url \t\t{output.logo=}")
 
 ########################################################################################################
 
