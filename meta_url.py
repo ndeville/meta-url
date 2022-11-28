@@ -65,19 +65,20 @@ meta_url = namedtuple('metaURL',
             'title', # str / find_title
             'name', # str / find_name
             'description', # str
-            'tags', # list / find_tags
+            'tags', # list / find_tags (method tbc)
             'contact_pages', # list / find_contact_pages
             'emails', # list / find_emails
             'phone', # string / find_phone
-            'email_patterns', # list / find_email_patterns
+            'email_patterns', # list / find_email_patterns (method tbc)
             'twitter', # list / find_socials
             'facebook', # str / find_socials
             'youtube', # str / find_socials
             'linkedin', # str / find_socials
             'tiktok', # str / find_socials
             'countries', # list / find_countries
-            'logo', # tbc / find_logo
-            'whois', # tbc / whois
+            'logo', # bin / find_logo (Clearbit)
+            'whois', # tbc / whois (optional)
+            'team', # list / NLP PERSON on team page
             ]
             )
 
@@ -163,8 +164,6 @@ def metadata_from_url_request(url, v=False):
         print(f"\n{get_linenumber()} html ERROR: {e}")
 
 def name_from_metadata(metadata):
-
-    
 
     ### TODO need to rework this
     for split_char in name_summary_split:
@@ -372,6 +371,7 @@ def meta(url, v=False, test=False):
             phone = '',
             linkedin = '',
             whois = '',
+            team = '',
             )
 
         if v:
@@ -386,8 +386,10 @@ def meta(url, v=False, test=False):
 
 ### TESTS
 
-### Global Variable
-
+test = meta('https://innovationnest.com')
+print(f"\n{test=}\n")
+for x in test:
+    print(x)
 
 
 ########################################################################################################

@@ -1,5 +1,7 @@
 # Nic
 
+driver/
+*.old
 test/
 raw/
 data/
