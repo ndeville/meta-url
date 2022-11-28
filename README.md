@@ -1,5 +1,5 @@
 # metaURL
-Fetch metadata from URL
+Fetch metadata from URL (using Selenium)
 
 [Project notes](https://notes.nicolasdeville.com/projects/metaurl/)
 
@@ -21,15 +21,15 @@ Output shoud be:
 ### namedtuple to be returned
 namedtuple('metaURL', 
             [
-            'clean_url',  # str / inline 
-            'clean_root_url', # str / inline
-            'domain', # str / inline
-            'slug', # str / inline
+            'clean_url',  # str / inline (working)
+            'clean_root_url', # str / inline (working)
+            'domain', # str / inline (working)
+            'slug', # str / inline (working)
             'header', # str / find_header
             'title', # str / find_title
             'name', # str / find_name
             'description', # str
-            'tags', # list / find_tags (method tbc)
+            'tags', # list / find_tags (optional for now, method tbc)
             'contact_pages', # list / find_contact_pages
             'emails', # list / find_emails
             'phone', # string / find_phone
@@ -40,9 +40,9 @@ namedtuple('metaURL',
             'linkedin', # str / find_socials
             'tiktok', # str / find_socials
             'countries', # list / find_countries
-            'logo', # bin / find_logo (Clearbit)
+            'logo', # bin / find_logo (working w/ Clearbit)
             'whois', # tbc / whois (optional)
-            'team', # list / NLP PERSON on team page
+            'team', # list / NLP PERSON on team page (TODO priority)
             ]
             )
 ```

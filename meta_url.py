@@ -23,7 +23,7 @@ from selenium.webdriver.chrome.service import Service
 
 import scrapee
 from collections import namedtuple
-import pymsgbox
+# import pymsgbox
 import pickle
 
 ### while building / debugging:
@@ -340,7 +340,7 @@ def meta(url, v=False, test=False):
     url = url.strip()
     if url.startswith('http'):
 
-        print(f"\n{get_linenumber()} meta test = {test}\n")
+        # print(f"\n{get_linenumber()} meta test = {test}\n")
 
         metadata = metadata_from_url_selenium(url, v=v, test=test) # name / title / description
 
@@ -363,7 +363,6 @@ def meta(url, v=False, test=False):
             twitter = scrape['twitter'],
             facebook = scrape['facebook'],
             youtube = scrape['youtube'],
-            linkedin = metadata_from_url_selenium(url, v)['linkedin'],
             tiktok = scrape['tiktok'],
             countries = scrape['countries'],
             logo = '', # using Clearbit / logic tbc
@@ -382,14 +381,7 @@ def meta(url, v=False, test=False):
     else:
         msg174 = f"{url} is not a valid URL."
         print(msg174)
-        pymsgbox.alert(msg174)
-
-### TESTS
-
-test = meta('https://innovationnest.com')
-print(f"\n{test=}\n")
-for x in test:
-    print(x)
+        # pymsgbox.alert(msg174)
 
 
 ########################################################################################################
@@ -400,7 +392,7 @@ if __name__ == '__main__':
     v = False # verbose mode
 
     for url in list_to_test:
-        print(separator())
+        separator()
         test_url = url
         print(f"\n#{get_linenumber()} {test_url=}")
 
@@ -408,9 +400,9 @@ if __name__ == '__main__':
 
         print(f"\n{get_linenumber()} output:\n")
         pp.pprint(output._asdict())
-        print()
-        print(f"len(output) = {len(output)}")
-        print(f"type(output) = {type(output)}")
+        # print()
+        # print(f"len(output) = {len(output)}")
+        # print(f"type(output) = {type(output)}")
         print()
         print(f"#{get_linenumber()} clean_url \t\t\t{output.clean_url=}")
         print(f"#{get_linenumber()} root_url \t\t\t{output.clean_root_url=}")

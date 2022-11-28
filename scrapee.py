@@ -63,7 +63,7 @@ def scrapee_homepage(url, v=False, test=False):
 
     }
 
-    print(f"\nscrapee_homepage test = {test}\n")
+    # print(f"\nscrapee_homepage test = {test}\n")
 
     templinks = []
     links = []
@@ -84,7 +84,7 @@ def scrapee_homepage(url, v=False, test=False):
     else:
         print(f"\nscrapee_homepage {get_linenumber()} RUNNING LIVE SCRAPING OF {url}\n")
         try:
-            print(f"scrapee_homepage {get_linenumber()} Crawling site: ",url)
+            # print(f"scrapee_homepage {get_linenumber()} Crawling site: ",url)
             opts = webdriver.ChromeOptions()
             opts.add_argument("start-maximized") #// https://stackoverflow.com/a/26283818/1689770
             opts.add_argument("enable-automation")# // https://stackoverflow.com/a/43840128/1689770
