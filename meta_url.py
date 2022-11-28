@@ -363,7 +363,7 @@ def meta(url, v=False, test=False):
             twitter = scrape['twitter'],
             facebook = scrape['facebook'],
             youtube = scrape['youtube'],
-            # linkedin = metadata_from_url_selenium(url, v)['linkedin'],
+            linkedin = metadata_from_url_selenium(url, v)['linkedin'],
             tiktok = scrape['tiktok'],
             countries = scrape['countries'],
             logo = '', # using Clearbit / logic tbc
@@ -398,11 +398,6 @@ if __name__ == '__main__':
     print('-------------------------------')
     test = False # for testing
     v = False # verbose mode
-
-    # output = metadata_from_url_selenium(test_url, v=v)
-    # output = scrapee.scrapee_homepage(test_url)
-    # output = scrapee.scrapee_twitter_from_homepage(test_url)
-    # output = scrapee.scrapee(test_url,max_error_count=10)
 
     for url in list_to_test:
         print(separator())

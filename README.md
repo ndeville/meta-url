@@ -15,7 +15,7 @@ url = 'https://...'
 x = meta(url)
 ```
 
-Output: namedtuple with    
+Output shoud be: 
 
 ``` python
 ### namedtuple to be returned
