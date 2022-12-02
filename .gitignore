@@ -1,15 +1,20 @@
 # Nic
 
+*_bxup*
+bb*.py
+perso/
 driver/
+old/
 *.old
+*_old*
 test/
 raw/
-data/
 log/
 .DS_Store
 .bash_profile
 .cache/
 __pycache__
+__pycache__.old
 .vscode/
 _backup/
 .idea/

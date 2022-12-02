@@ -1,0 +1,379 @@
+tld,country_code,eu,name
+.abudhabi,AE,0,Abu Dhabi
+.af,AF,0,Afghanistan
+.ax,FI,1,Åland
+.al,AL,0,Albania
+.dz,DZ,0,Algeria
+.as,AS,0,American Samoa
+.ad,AD,0,Andorra
+.ao,AO,0,Angola
+.ai,AI,0,Anguilla
+.aq,AQ,0,Antarctica
+.ag,AG,0,Antigua and Barbuda
+.ar,AR,0,Argentina
+.am,AM,0,Armenia
+.aw,AW,0,Aruba
+.ac,UK,1,Ascension Island
+.au,AU,0,Australia
+.at,AT,1,Austria
+.az,AZ,0,Azerbaijan
+.bs,BS,0,Bahamas
+.bh,BH,0,Bahrain
+.bd,BD,0,Bangladesh
+.bb,BB,0,Barbados
+.eus,,0,Basque Country
+.by,BY,0,Belarus
+.be,BE,1,Belgium
+.bz,BZ,0,Belize
+.bj,BJ,0,Benin
+.bm,BM,0,Bermuda
+.bt,BT,0,Bhutan
+.bo,BO,0,Bolivia
+.bq,,0,Bonaire
+.ba,BA,0,Bosnia and Herzegovina
+.bw,BW,0,Botswana
+.bv,,0,Bouvet Island
+.br,BR,0,Brazil
+.io,None,1,None
+.vg,UK,1,British Virgin Islands
+.bn,BN,0,Brunei
+.bg,BG,1,Bulgaria
+.bf,BF,0,Burkina Faso
+.mm,,0,Burma
+.bi,BI,0,Burundi
+.kh,KH,0,Cambodia
+.cm,CM,0,Cameroon
+.ca,CA,0,Canada
+.cv,CV,0,Cape Verde
+.cat,ES,1,Catalonia
+.ky,KY,0,Cayman Islands
+.cf,CF,0,Central African Republic
+.td,TD,0,Chad
+.cl,CL,0,Chile
+.cn,CN,0,China
+.cx,CX,0,Christmas Island
+.cc,,0,Cocos  Islands
+.co,CO,0,Colombia
+.km,KM,0,Comoros
+.cd,CD,0,Congo
+.cg,CD,0,Congo
+.ck,CK,0,Cook Islands
+.cr,CR,0,Costa Rica
+.ci,CI,0,Côte d’Ivoire
+.hr,HR,1,Croatia
+.cu,CU,0,Cuba
+.cw,,0,Curaçao
+.cy,CY,1,Cyprus
+.nc.tr,,0,Cyprus
+.cz,CZ,1,Czechia
+.dk,DK,1,Denmark
+.dj,DJ,0,Djibouti
+.dm,DM,0,Dominica
+.do,DO,0,Dominican Republic
+.ae,,0,Dubai
+.tl,,0,East Timor
+.ec,EC,0,Ecuador
+.eg,EG,0,Egypt
+.sv,SV,0,El Salvador
+.uk,UK,1,England
+.gq,GQ,0,Equatorial Guinea
+.er,ER,0,Eritrea
+.ee,EE,1,Estonia
+.et,ET,0,Ethiopia
+.eu,EU,1,European Union
+.fo,,0,Faeroe Islands
+.fk,FK,0,Falkland Islands
+.fj,FJ,0,Fiji
+.fi,FI,1,Finland
+.fr,FR,1,France
+.gf,GF,0,French Guiana
+.pf,PF,0,French Polynesia
+.tf,FR,1,French Southern and Antarctic Lands
+.ga,GA,0,Gabon
+.gal,,0,Galicia
+.gm,GM,0,Gambia
+.ps,,0,Gaza Strip
+.ge,GE,0,Georgia
+.de,DE,1,Germany
+.gh,GH,0,Ghana
+.gi,GI,0,Gibraltar
+.uk,UK,1,Great Britain
+.gr,GR,1,Greece
+.gl,GL,0,Greenland
+.gd,GD,0,Grenada
+.gp,GP,0,Guadeloupe
+.gu,GU,0,Guam
+.gt,GT,0,Guatemala
+.gg,UK,1,Guernsey
+.gn,GN,0,Guinea
+.gw,GW,0,Guinea-Bissau
+.gy,GY,0,Guyana
+.ht,HT,0,Haiti
+.hm,,0,Heard Island and McDonald Islands
+.nl,NL,1,Holland
+.hn,HN,0,Honduras
+.hk,HK,0,Hong Kong
+.hu,HU,1,Hungary
+.is,IS,0,Iceland
+.in,IN,0,India
+.id,ID,0,Indonesia
+.ir,IR,0,Iran
+.iq,IQ,0,Iraq
+.ie,IE,1,Ireland
+.im,UK,1,Isle of Man
+.il,IL,0,Israel
+.it,IT,1,Italy
+.jm,JM,0,Jamaica
+.jp,JP,0,Japan
+.je,UK,1,Jersey
+.jo,JO,0,Jordan
+.kz,KZ,0,Kazakhstan
+.ke,KE,0,Kenya
+.ki,KI,0,Kiribati
+.kp,KP,0,North Korea
+.kr,KR,0,South Korea
+not,XK,0,Kosovo
+.kw,KW,0,Kuwait
+.kg,KG,0,Kyrgyzstan
+.la,LA,0,Laos
+.lv,LV,1,Latvia
+.lb,LB,0,Lebanon
+.ls,LS,0,Lesotho
+.lr,LR,0,Liberia
+.ly,LY,0,Libya
+.li,LI,0,Liechtenstein
+.lt,LT,1,Lithuania
+.lu,LU,1,Luxembourg
+.mo,MO,0,Macau
+.mk,,0,North Macedonia
+.mg,MG,0,Madagascar
+.mw,MW,0,Malawi
+.my,MY,0,Malaysia
+.mv,MV,0,Maldives
+.ml,ML,0,Mali
+.mt,MT,1,Malta
+.mh,MH,0,Marshall Islands
+.mq,MQ,0,Martinique
+.mr,MR,0,Mauritania
+.mu,MU,0,Mauritius
+.yt,YT,0,Mayotte
+.mx,MX,0,Mexico
+.fm,FM,0,Micronesia
+.md,MD,0,Moldova
+.mc,MC,0,Monaco
+.mn,MN,0,Mongolia
+.me,ME,0,Montenegro
+.ms,MS,0,Montserrat
+.ma,MA,0,Morocco
+.mz,MZ,0,Mozambique
+.mm,MM,0,Myanmar
+.na,,0,Namibia
+.nr,NR,0,Nauru
+.np,NP,0,Nepal
+.nl,NL,1,Netherlands
+.nc,NC,0,New Caledonia
+.nz,NZ,0,New Zealand
+.ni,NI,0,Nicaragua
+.ne,NE,0,Niger
+.ng,NG,0,Nigeria
+.nu,NU,0,Niue
+.nf,NF,0,Norfolk Island
+.nc.tr,,0,North Cyprus
+.kp,KP,0,North Korea
+.mk,,0,North Macedonia
+.uk,UK,1,Northern Ireland
+.mp,MP,0,Northern Mariana Islands
+.no,NO,0,Norway
+.om,OM,0,Oman
+.pk,PK,0,Pakistan
+.pw,PW,0,Palau
+.ps,,0,Palestine
+.pa,PA,0,Panama
+.pg,PG,0,Papua New Guinea
+.py,PY,0,Paraguay
+.pe,PE,0,Peru
+.ph,PH,0,Philippines
+.pn,,0,Pitcairn Islands
+.pl,PL,1,Poland
+.pt,PT,1,Portugal
+.pr,PR,0,Puerto Rico
+.qa,QA,0,Qatar
+.re,RE,0,Réunion
+.ro,RO,1,Romania
+.ru,RU,0,Russia
+.rw,RW,0,Rwanda
+.bq,NL,1,Saba
+.bl,,0,Saint Barthélemy
+.sh,SH,0,Saint Helena
+.kn,KN,0,Saint Kitts and Nevis
+.lc,LC,0,Saint Lucia
+.mf,,0,Saint Martin
+.vc,,0,Saint Vincent and the Grenadines
+.pm,,0,Saint-Pierre and Miquelon
+.ws,WS,0,Samoa
+.sm,SM,0,San Marino
+.st,,0,São Tomé and Príncipe
+.sa,SA,0,Saudi Arabia
+.uk,UK,1,Scotland
+.sn,SN,0,Senegal
+.rs,RS,0,Serbia
+.sc,SC,0,Seychelles
+.sl,SL,0,Sierra Leone
+.sg,SG,0,Singapore
+.bq,,0,Sint Eustatius
+.sx,,0,Sint Maarten
+.sk,SK,1,Slovakia
+.si,SI,1,Slovenia
+.sb,SB,0,Solomon Islands
+.so,SO,0,Somalia
+.so,SO,0,Somaliland
+.za,ZA,0,South Africa
+.gs,,0,South Georgia and the South Sandwich Islands
+.kr,KR,0,South Korea
+.ss,,0,South Sudan
+.es,ES,1,Spain
+.lk,LK,0,Sri Lanka
+.sd,SD,0,Sudan
+.sr,SR,0,Suriname
+.sj,,0,Svalbard and Jan Mayen Islands
+.sz,SZ,0,Swaziland
+.se,SE,1,Sweden
+.ch,CH,1,Switzerland
+.sy,SY,0,Syria
+.pf,FR,1,Tahiti
+.tw,TW,0,Taiwan
+.tj,TJ,0,Tajikistan
+.tz,TZ,0,Tanzania
+.th,TH,0,Thailand
+.tg,TG,0,Togo
+.tk,TK,0,Tokelau
+.to,TO,0,Tonga
+.tt,TT,0,Trinidad and Tobago
+.tn,TN,0,Tunisia
+.tr,TR,0,Turkey
+.tm,TM,0,Turkmenistan
+.tc,TC,0,Turks and Caicos Islands
+.tv,TV,0,Tuvalu
+.ug,UG,0,Uganda
+.ua,UA,0,Ukraine
+.ae,AE,0,United Arab Emirates
+.uk,UK,1,United Kingdom
+.us,US,0,United States of America
+.vi,US,0,United States Virgin Islands
+.uy,UY,0,Uruguay
+.uz,UZ,0,Uzbekistan
+.vu,VU,0,Vanuatu
+.va,VA,0,Vatican City
+.ve,VE,0,Venezuela
+.vn,VN,0,Vietnam
+.uk,UK,1,Wales
+.wf,WF,0,Wallis and Futuna
+.ps,,0,West Bank
+.eh,,0,Western Sahara
+.ye,YE,0,Yemen
+.zm,ZM,0,Zambia
+.zw,ZW,0,Zimbabwe
+.blog,None,0,None
+.edu,None,0,None
+.ag,None,0,None
+.tv,None,0,None
+.co.uk,UK,1,United Kingdom
+.edu.pl,PL,1,Poland
+.services,None,0,None
+.design,None,0,None
+.london,UK,1,United Kingdom
+.org.uk,UK,1,United Kingdom
+.nhs.uk,UK,1,United Kingdom
+.ac.uk,UK,1,United Kingdom
+.net,None,0,None
+.bio,None,0,None
+.biz,None,0,None
+.fund,None,0,None
+.world,None,0,None
+.ventures,None,0,None
+.gouv.fr,FR,1,France
+.ac.at,AT,1,Austria
+.club,None,0,None
+.org,None,0,None
+.com.mt,MT,0,None
+.global,None,0,None
+.training,None,0,None
+.team,None,0,None
+.events,None,0,None
+.studio,None,0,None
+.info,None,0,None
+.live,None,0,None
+.paris,FR,1,France
+.agency,None,0,None
+.tech,None,0,None
+.int,None,0,None
+.berlin,DE,1,Germany
+.com,None,0,None
+.pro,None,0,None
+.online,None,0,None
+.digital,None,0,None
+.international,None,0,None
+.physio,None,0,None
+.gov.uk,UK,1,United Kingdom
+.earth,None,0,None
+.solutions,None,0,None
+.network,None,0,None
+.travel,None,0,None
+.shop,None,0,None
+.com.au,AU,0,Australia
+.co.za,ZA,0,South Africa
+.com.tr,TR,0,Turkey
+.co.nz,NZ,0,None
+.com.br,BR,0,None
+.com.sg,SG,0,None
+.bike,None,0,None
+.rocks,None,0,None
+.store,None,0,None
+.koeln,DE,0,None
+.in.ua,UA,0,None
+.store,None,0,None
+.co.nz,NZ,0,None
+.top,None,0,None
+.deals,None,0,None
+.site,None,0,None
+.com.hk,HK,0,None
+.store,None,0,None
+.site,None,0,None
+.store,None,0,None
+.dn.ua,UA,0,None
+.store,None,0,None
+.co.nz,NZ,0,None
+.store,None,0,None
+.net.au,AU,0,None
+.site,None,0,None
+.com.ua,UA,0,None
+.com.pl,PL,0,None
+.com.cn,CN,0,None
+.com.pl,PL,0,None
+.com.tw,TW,0,None
+.co.nz,NZ,0,None
+.co.nz,NZ,0,None
+.co.nz,NZ,0,None
+.com.ua,UA,0,None
+.in.ua,UA,0,None
+.com.gr,GR,0,None
+.surf,None,0,None
+.net.au,AU,0,None
+.audio,None,0,None
+.net.pl,PL,1,None
+.co.jp,JP,0,None
+.co.kr,KR,0,None
+.org,None,0,None
+.net,None,0,None
+.audio,None,0,None
+.tv,None,0,None
+.mobi,None,0,None
+.club,None,0,None
+.eu,None,0,None
+.biz,None,0,None
+.link,None,0,None
+.com,None,0,None
+.tech,None,0,None
+.info,None,0,None
+.co.it,IT,1,Italy
+.works,None,0,None
