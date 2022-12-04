@@ -1,27 +1,30 @@
 import spacy
-from thefuzz import fuzz, process
-import tldextract
+# from thefuzz import fuzz, process
+# import tldextract
+
+# script name
+loc = "get/name"
 
 from inspect import currentframe
-def get_linenumber():
+def ln():
     cf = currentframe()
     return cf.f_back.f_lineno
 
 ### Supporting Functions
 
-def domain_name_from_url(url):
-    # import tldextract
-    o = tldextract.extract(url)
-    domain_name = o.domain.lower()
-    if 'www.' in domain_name:
-        domain_name = domain_name.replace('www.','')
-    return domain_name
+# def domain_name_from_url(url):
+#     # import tldextract
+#     o = tldextract.extract(url)
+#     domain_name = o.domain.lower()
+#     if 'www.' in domain_name:
+#         domain_name = domain_name.replace('www.','')
+#     return domain_name
 
 ### MAIN
 
 def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
-    global add_keywords_to_remove
-    keywords_to_remove = keywords_to_remove + add_keywords_to_remove
+    # global add_keywords_to_remove
+    # keywords_to_remove = keywords_to_remove + add_keywords_to_remove
 
     soup = soup_tuple.soup
     url = soup_tuple.url
@@ -39,7 +42,7 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
     ####
 
     list_orgs = []
-    list_countries_found = []
+    # list_countries_found = []
 
     if v:
         print(f"\nents:\n")
@@ -51,18 +54,17 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
                 print()
             list_orgs.append(ent.text)
 
+    # root_name = domain_name_from_url(url)
 
-    root_name = domain_name_from_url(url)
-
-    if len(list_orgs) > 0:
-        org_name = process.extractOne(root_name, list_orgs)[0]
-    else:
-        org_name = None
+    # if len(list_orgs) > 0:
+    #     org_name = process.extractOne(root_name, list_orgs)[0]
+    # else:
+    #     org_name = None
         
     if v:
-        print(f"\nget.name #{get_linenumber()}: {org_name=}")
+        print(f"\nget.name #{ln()} f: {list_orgs=}")
     
-    return org_name
+    return list_orgs
     
 
     # text = soup.get_text()

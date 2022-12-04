@@ -4,11 +4,17 @@ import re
 
 ### Supporting Functions
 
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+
+# script name
+loc = "get/emails"
+
 # get line numbers
 from inspect import currentframe
-def get_linenumber():
+def ln():
     """
-    print line numbers with f"{get_linenumber()}"
+    print line numbers with f"{ln()}"
     """
     cf = currentframe()
     return cf.f_back.f_lineno
@@ -32,7 +38,7 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
         url = url[:-1]
 
     if v:
-        print(f"\n---\nget.emails #{get_linenumber()}: parsing {url}")
+        print(f"\n---\n{loc} #{ln()}: parsing {url}")
 
     set_emails = set() # start with set to avoid duplicates
 
@@ -44,7 +50,7 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
     matches = re.findall(email_regex, text)
     if v:
-        print(f"\nget.emails #{get_linenumber()} matches: {matches}")
+        print(f"\n{loc} #{ln()} matches: {matches}")
 
     if len(matches) > 0:
         for match in matches:
@@ -56,10 +62,10 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
     # links = soup.find_all('a')
 
     # if v:
-    #     print(f"\nget.links.internal #{get_linenumber()}: {len(links)} links found:")
+    #     print(f"\nget.links.internal #{ln()}: {len(links)} links found:")
     # for l in links:
     #     if v:
-    #         print(f"\nget.links.internal #{get_linenumber()}: {l}")
+    #         print(f"\nget.links.internal #{ln()}: {l}")
             
     #     try:
     #         href = l['href']
@@ -77,12 +83,13 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
     # sorted_list_people_found = sorted(set_emails)
 
     if v:
-        print(f"\nget.emails #{get_linenumber()} dict_emails_to_return: {dict_emails_to_return}")
+        print(f"\n{loc} #{ln()} dict_emails_to_return: {dict_emails_to_return}")
+        pp.pprint(dict_emails_to_return)
 
     # list_emails = list(set_emails).sort()
     # dict_emails_to_return = sorted(dict_emails_to_return)
 
     if v and len(dict_emails_to_return) > 0:
-        print(f"\n---\nget.emails #{get_linenumber()}: \nRETURNED dict of all EMAILS from {url} ({len(dict_emails_to_return)}):\n{dict_emails_to_return}.\n---\n")
+        print(f"\n---\n{loc} #{ln()}: \nRETURNED dict of all EMAILS from {url} ({len(dict_emails_to_return)}):\n{dict_emails_to_return}.\n---\n")
 
     return dict_emails_to_return

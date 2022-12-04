@@ -2,6 +2,8 @@
 
 ### Supporting Functions
 
+# script name
+loc = f"get/tags"
 
 ### MAIN
 

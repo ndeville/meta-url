@@ -6,19 +6,79 @@ import spacy
 
 keywords_to_remove = [
     '.pdf',
-    'protection',
-    'login',
-    'portfolio',
-    'news',
-    'founder',
-    'jobs',
-    'investor',
-    'fintech',
-    'frequently',
-    'insights',
+    'controller',
     'faq',
-    'mentor',
+    'fintech',
+    'founder',
+    'frequently',
     'headliner',
+    'insights',
+    'investor',
+    'jobs',
+    'login',
+    'mentor',
+    'news',
+    'portfolio',
+    'protection',
+]
+
+to_remove = [
+    'Advisor', 
+    'Analyst', # TODO: add logic to exclude person fully
+    'CIO', # TODO: add logic to exclude person fully
+    'Advisor', # TODO: add logic to exclude person fully
+    'Office',
+    'Associate',
+    'Finance',
+    'Budget',
+    'Marketing',
+]
+
+to_clean = [
+            '\n',
+            'Advisor',
+            'Area',
+            'Associate',
+            'Board',
+            'Business',
+            'CCO',
+            'CEO',
+            'COO',
+            'CTO',
+            'Chief',
+            'Comittee',
+            'Controller',
+            'Director',
+            'Entrepreneurial',
+            'Executive',
+            'Former',
+            'Founder',
+            'Founding',
+            'Fund',
+            'General',
+            'HR',
+            'Head',
+            'Interning',
+            'Investment',
+            'Investor',
+            'Manager',
+            'Managing',
+            'Member',
+            'Operating',
+            'Operations',
+            'Partner',
+            'Principal',
+            'Recognized',
+            'SENIOR',
+            'Sales',
+            'Scientific',
+            'Senior',
+            'Specialist',
+            'Strategic',
+            'Talent',
+            'Team',
+            'Venture',
+            'Vice',
 ]
 
 add_keywords_to_remove = [
@@ -27,60 +87,20 @@ add_keywords_to_remove = [
 
 ### Supporting Functions
 
+# script name
+loc = "get/team"
 # get line numbers
 from inspect import currentframe
-def get_linenumber():
-    """
-    print line numbers with f"{get_linenumber()}"
-    """
+def ln(): # print line numbers with f"{ln()}"
     cf = currentframe()
     return cf.f_back.f_lineno
 
 
 def clean_string(string):
+    global to_clean
 
     # TODO: extract to CSV / add \n separately
-    to_clean = [
-    'Partner',
-    'Founder',
-    'Founding',
-    'Venture',
-    'Area',
-    '\n',
-    'Operating',
-    'Recognized',
-    'Managing',
-    'General',
-    'Chief',
-    'Director',
-    'Executive',
-    'Talent',
-    'Board',
-    'Head',
-    'Senior',
-    'SENIOR',
-    'Operations',
-    'Entrepreneurial',
-    'Investor',
-    'Former',
-    'Member',
-    'Scientific',
-    'CCO',
-    'Operations',
-    'Manager',
-    'CTO',
-    'HR',
-    'COO',
-    'Vice',
-    'Comittee',
-    'Interning',
-    'Fund',
-    'Business',
-    'Principal',
-    'Investment',
-    'Sales',
-    'Specialist',
-    ]
+
 
     for item in to_clean:
         if item in string:
@@ -93,6 +113,8 @@ def clean_string(string):
 
 def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
     global add_keywords_to_remove
+    global to_clean
+    global to_remove
     keywords_to_remove = keywords_to_remove + add_keywords_to_remove
 
     soup = soup_tuple.soup
@@ -101,7 +123,7 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
         url = url[:-1]
 
     if v:
-        print(f"\n---\nget.team #{get_linenumber()}: parsing {url}\n")
+        print(f"\n---\n{loc} #{ln()}: parsing {url}\n")
 
     set_people_found = set()
 
@@ -114,37 +136,41 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
     #     print(f"\nents:\n")
     count_person = 0
     if v:
-        print(f"\nget.team #{get_linenumber()}: {len(doc.ents)} entities in doc.ents:\n")
+        print(f"\n{loc} #{ln()}: {len(doc.ents)} entities in doc.ents:\n")
     for ent in doc.ents:
         
         label = ent.label_
 
         if v:
-            print(f"get.team #{get_linenumber()}: {label} ➤ {ent}")
+            print(f"{loc} #{ln()}: {label} ➤ {ent}")
 
         if label == 'PERSON':
             count_person += 1
             person = ent.text
             if v:
-                print(f"get.team #{get_linenumber()}: {count_person} {repr(person)} ➤ {label}")
+                print(f"{loc} #{ln()}: {count_person} {repr(person)} ➤ {label}")
             if ' ' in person: # remove single-word names
                 if not any(ele in person for ele in keywords_to_remove): # remove people with specific keywords listed in to_remove
                     set_people_found.add(clean_string(person))
                 else:
-                    print(f"get.team #{get_linenumber()}: ------REMOVING: {person}")
+                    print(f"{loc} #{ln()}: ------REMOVING: {person}")
 
     sorted_list_people_found = sorted(set_people_found)
 
     if v:
-        print(f"\nget.team #{get_linenumber()}: {len(sorted_list_people_found)} records in sorted_list_people_found:")
+        print(f"\n{loc} #{ln()}: {len(sorted_list_people_found)} records in sorted_list_people_found:")
         for p in sorted_list_people_found:
-            print(f"get.team #{get_linenumber()}: {repr(p)}")
+            print(f"{loc} #{ln()}: {repr(p)}")
 
-    return list(sorted_list_people_found)
+    dict_to_return = {}
+    for person in sorted_list_people_found:
+        dict_to_return[person.title()] = url
+
+    return dict_to_return
 
 
 ########################################################################################################
 
 if __name__ == '__main__':
-
+    
     print()

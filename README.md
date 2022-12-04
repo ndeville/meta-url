@@ -5,7 +5,13 @@ Fetch metadata from URL (using Selenium)
 
 Work in progress.  
 
-Use should be as follow:
+# Requirements
+
+- Selenium: for headless browser
+- BeautifulSoup: for web scraping
+- SpaCY: for NLP (identification of people, places and organisations)
+
+# Usage
 
 ``` python
 from meta_url import meta
@@ -15,34 +21,38 @@ url = 'https://...'
 x = meta(url)
 ```
 
-Output shoud be: 
+Output: 
 
 ``` python
 ### namedtuple to be returned
 namedtuple('metaURL', 
             [
-            'clean_url',  # str / inline (WORKING)
-            'clean_root_url', # str / inline (WORKING)
-            'domain', # str / inline (WORKING)
-            'slug', # str / inline (WORKING)
-            'header', # str / find_header
-            'title', # str / find_title
-            'name', # str / find_name
-            'description', # str
-            'tags', # list / find_tags (optional for now, method tbc)
-            'contact_pages', # list / find_contact_pages
-            'emails', # list / find_emails
-            'phone', # string / find_phone
+            'clean_url',  # str / inline 
+            'clean_root_url', # str / inline
+            'contact_pages', # list / from get.links import contact
+            'countries', # list / get.countries
+            'description', # str / get.metadata
+            'domain', # str / inline
+            'emails', # list / get.emails
             'email_patterns', # list / find_email_patterns (method tbc)
-            'twitter', # list / find_socials (WORKING)
-            'facebook', # str / find_socials (WORKING)
-            'youtube', # str / find_socials (WORKING)
-            'linkedin', # str / find_socials
-            'tiktok', # str / find_socials
-            'countries', # list / find_countries
-            'logo', # bin / find_logo (working w/ Clearbit)
-            'whois', # tbc / whois (optional)
-            'team', # list / NLP PERSON on team page (TODO priority)
+            'facebook', # str / from get.links import socials
+            'files', # set / get.links.files
+            'h1', # str / get.metadata
+            'internal_links', # set / get.links.internal
+            'keywords', # list / get.metadata
+            'linkedin', # str / from get.links import socials
+            'logo', # bin / get.logo
+            'medium', # str / from get.links import socials
+            'name', # str / get.name
+            'phone', # string / get.phone
+            'slug', # str / inline
+            'tags', # list / get.tags (method tbc)
+            'team', # list / get.team
+            'tiktok', # str / from get.links import socials
+            'title', # str / get.metadata
+            'twitter', # list / from get.links import socials
+            'whois', # str / get.whois
+            'youtube', # str / from get.links import socials
             ]
             )
 ```
@@ -80,3 +90,8 @@ namedtuple('metaURL',
 ## `email_pattern`
 
 - this can only be identified if a non-generic email address (ie person email) is present on the website. 
+
+
+
+
+Open-source project originated as part of work at [BtoBSales.EU](https://btobsales.eu)

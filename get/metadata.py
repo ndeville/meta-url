@@ -1,9 +1,14 @@
+# script name
+loc = "get/metadata"
+
 from collections import namedtuple
 
 from inspect import currentframe
-def get_linenumber():
+def ln():
     cf = currentframe()
     return cf.f_back.f_lineno
+
+
 
 ### MAIN
 
@@ -26,9 +31,9 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
     metas = [x for x in soup.find_all('meta')]
     if v:
-        print(f"\nget.metadata #{get_linenumber()}: {len(metas)} meta tags found in total:\n")
+        print(f"\n{loc} #{ln()}: {len(metas)} meta tags found in total:\n")
         for m in metas:
-            print(f"get.metadata #{get_linenumber()}: {m}")
+            print(f"{loc} #{ln()}: {m}")
         print()
 
     tag_types = [
@@ -42,7 +47,9 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
     keywords = ''
     description = ''
+    og_description = ''
     page_title = soup.title.text
+    title = ''
     og_title = ''
     try:
         h1 = soup.h1.text
@@ -51,7 +58,7 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
     except:
         h1 = ''
     if v:
-        print(f"\nget.metadata #{get_linenumber()}: {h1=}\n")
+        print(f"\n{loc} #{ln()}: {h1=}\n")
     site_name = ''
 
     for tag in metas:
@@ -61,42 +68,49 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
         if 'name' in tag.attrs.keys() and tag.attrs['name'].strip().lower() == 'keywords':
             keywords = tag.attrs['content']
             if v:
-                print (f'get.metadata #{get_linenumber()}: CONTENT NAME :',tag.attrs['content'])
+                print (f'{loc} #{ln()}: CONTENT NAME :',tag.attrs['content'])
 
         if 'name' in tag.attrs.keys() and tag.attrs['name'].strip().lower() == 'description':
             description = tag.attrs['content']
             if v:
-                print (f'get.metadata #{get_linenumber()}: CONTENT NAME :',tag.attrs['content'])
+                print (f'{loc} #{ln()}: CONTENT NAME :',tag.attrs['content'])
 
         # Property tags
 
         if 'property' in tag.attrs.keys() and tag.attrs['property'].strip().lower() == 'og:title':
             og_title = tag.attrs['content']
             if v:
-                print (f'get.metadata #{get_linenumber()}: CONTENT PROPERTY :',tag.attrs['content'])
+                print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
 
         if 'property' in tag.attrs.keys() and tag.attrs['property'].strip().lower() == 'og:site_name':
             site_name = tag.attrs['content']
             if v:
-                print (f'get.metadata #{get_linenumber()}: CONTENT PROPERTY :',tag.attrs['content'])
+                print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
 
         if 'property' in tag.attrs.keys() and tag.attrs['property'].strip().lower() == 'og:description':
-            description = tag.attrs['content']
+            og_description = tag.attrs['content']
             if v:
-                print (f'get.metadata #{get_linenumber()}: CONTENT PROPERTY :',tag.attrs['content'])
+                print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
 
     if v:
         print(f"\nChoosing between og_title and page_title for title:")
-        print(f"get.metadata #{get_linenumber()}: {page_title=}")
-        print(f"get.metadata #{get_linenumber()}: {og_title=}")
+        print(f"{loc} #{ln()}: {page_title=}")
+        print(f"{loc} #{ln()}: {og_title=}")
+
+    # Select between alternatives
 
     if page_title > og_title:
         title = page_title
     else:
         title = og_title
 
+    if description > og_description:
+        description = description
+    else:
+        description = og_description
+
     if v:
-        print(f"Selected {title}\n")
+        print(f"➤ Selected \"{title}\"\n")
 
     # Cleaning
 
@@ -142,7 +156,7 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
 
     if v:
-        print(f"get.metadata #{get_linenumber()}: NOTE: returns namedtuple of metadata fields: {','.join(meta_fields)}.\n---\n")
+        print(f"{loc} #{ln()}: NOTE: returns namedtuple of metadata fields: {','.join(meta_fields)}.\n---\n")
 
     # return metadata
     return metadata

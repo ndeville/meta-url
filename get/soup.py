@@ -21,11 +21,14 @@ driverpath = config['CHROMEDRIVER']
 
 # Supporting functions
 
+# script name
+loc = f"get/soup"
+
 # get line numbers
 from inspect import currentframe
-def get_linenumber():
+def ln():
     """
-    print line numbers with f"{get_linenumber()}"
+    print line numbers with f"{ln()}"
     """
     cf = currentframe()
     return cf.f_back.f_lineno
@@ -36,18 +39,18 @@ def main(url,test=False,v=False):
 
     ip = check_ip()
     if ip:
-        print(f"\nget.soup #{get_linenumber()} EXPOSED crawling {url} (true IP used)")
+        print(f"\n{loc} #{ln()} EXPOSED crawling {url} (true IP used)")
     else:
-        print(f"\nget.soup #{get_linenumber()} PROTECTED crawling {url}")
+        print(f"\n{loc} #{ln()} PROTECTED crawling {url}")
 
     if v:
-        print(f"\nget.soup.main #{get_linenumber()}: NOTE: get.soup.main returns a named tuple with .url and .soup\n")
+        print(f"\n{loc} #{ln()}: NOTE: {loc}.main returns a named tuple with .url and .soup\n")
 
     soup_tuple = namedtuple('soup_dict', ['url', 'soup'])
 
 
     if v: 
-        print(f"\nget.soup #{get_linenumber()}: Processing {url=}")
+        print(f"\n{loc} #{ln()}: Processing {url=}")
 
     #Selenium
     s = Service(driverpath)
@@ -65,16 +68,17 @@ def main(url,test=False,v=False):
 
     driver = webdriver.Chrome(service=s,options=opts)
     # driver = webdriver.Chrome(driverpath,options=opts)
-    driver.implicitly_wait(15)
+    
     driver.set_page_load_timeout(25)
     driver.get(url)
+    driver.implicitly_wait(10) # not working??
     htmltext = driver.page_source
     driver.quit()
 
     soup = BeautifulSoup(htmltext, 'html.parser')
 
     # if v:
-    #     print(f"from get.soup: {soup}")
+    #     print(f"from {loc}: {soup}")
 
     output = soup_tuple(url=url, soup=soup)
 

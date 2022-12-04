@@ -10,6 +10,12 @@ dict_grist_domains = {x.id: x.domain for x in grist_BB.VCs.fetch_table('Master')
 
 # Supporting functions
 
+# get script name
+import sys
+def get_loc():
+    return f"{sys.argv[0][18:-3]}"
+loc = get_loc()
+
 def find_key(input_dict, value):
     for k, v in input_dict.items():
         if v == value:

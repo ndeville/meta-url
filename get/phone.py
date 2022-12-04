@@ -2,6 +2,8 @@
 
 ### Supporting Functions
 
+# script name
+loc = "get/phone"
 
 ### MAIN
 

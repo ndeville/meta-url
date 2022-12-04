@@ -23,11 +23,14 @@ add_keywords_to_remove = [
         'javascript',
 ]
 
+# script name
+loc = "get/links"
+
 # get line numbers
 from inspect import currentframe
-def get_linenumber():
+def ln():
     """
-    print line numbers with f"{get_linenumber()}"
+    print line numbers with f"{ln()}"
     """
     cf = currentframe()
     return cf.f_back.f_lineno
@@ -65,57 +68,66 @@ def internal(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=F
 
     if v:
         print()
-        print(f"get.links.internal #{get_linenumber()}: {url=}")
+        print(f"{loc}.internal #{ln()}: {url=}")
 
     domain_name = domain_name_from_url(url)
     if v: 
-        print(f"get.links.internal #{get_linenumber()}: domain_name: {domain_name}")
+        print(f"{loc}.internal #{ln()}: domain_name: {domain_name}")
     
     set_links = set()
+    dict_mailtos = {}
 
     links = soup.find_all('a')
 
     if v:
-        print(f"\nget.links.internal #{get_linenumber()}: {len(links)} links found:")
+        print(f"\n{loc}.internal #{ln()}: {len(links)} links found:\n")
     for l in links:
-        if v:
-            print(f"\nget.links.internal #{get_linenumber()}: {l}")
+        # if v:
+        #     print(f"\n{loc}.internal #{ln()}: {l}")
             
         try:
             href = l['href']
             if v:
-                print(f"get.links.internal #{get_linenumber()}: {type(href)} {href=}")
+                print(f"{loc}.internal #{ln()}: {type(href)} {href=}")
             if not any(ele in href for ele in keywords_to_remove):
 
-                if domain_name in href and not href.startswith('/'): # NOT if href startswith as some links will be on a different (sub)domain
+                if domain_name in href and not href.startswith('/') and not href.startswith('mailto'): # NOT if href startswith as some links will be on a different (sub)domain
                     link = href.strip()
                     set_links.add(link)
                     if v:
-                        print(f"get.links.internal #{get_linenumber()}: ADDED {link}")
+                        print(f"{loc}.internal #{ln()}: ADDED {link}")
+                # add mailto links to separate dict
+                elif domain_name in href and href.startswith('mailto'): 
+                    email = href.replace('mailto:', '').strip()
+                    dict_mailtos[email] = link
+                    if v:
+                        print(f"{loc}.internal #{ln()}: ADDED EMAIL {email} from {link}")
                 else:
                     if v:
-                        print(f"get.links.internal #{get_linenumber()}: REMOVED {href} - {domain_name} not in.")
+                        print(f"{loc}.internal #{ln()}: REMOVED {href} - {domain_name} not in.")
 
                 if href.startswith('/'):
                     link = f"{url}{href.strip()}"
                     set_links.add(link)
                     if v:
-                        print(f"get.links.internal #{get_linenumber()}: ADDED {link}")
+                        print(f"{loc}.internal #{ln()}: ADDED {link}")
             else:
                 if v:
-                    print(f"get.links.internal #{get_linenumber()}: REMOVED {href} - blacklist")
+                    print(f"{loc}.internal #{ln()}: REMOVED {href} - blacklist")
             
         except:
             if v:
-                print(f"get.links.internal #{get_linenumber()}: ------ERROR with {l}")
+                print(f"{loc}.internal #{ln()}: ------ERROR with {l}")
             continue
 
     set_links = set(sorted(set_links))
 
-    if v:
-        print(f"\n---\nget.links.internal #{get_linenumber()}: \nRETURNED set of all INTERNAL links ({len(set_links)}):\n{set_links}.\n---\n")
+    dict_return = {'internal_links':set_links,'emails':dict_mailtos}
 
-    return set_links
+    if v:
+        print(f"\n---\n{loc}.internal #{ln()}: \nRETURNED set of all INTERNAL links ({len(set_links)}):\n{set_links}.\n---\n")
+
+    return dict_return
 
 
 
@@ -133,22 +145,22 @@ def all(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False)
         url = url[:-1]
 
     if v:
-        print(f"\nget.links.all #{get_linenumber()}: {url=}\n")
+        print(f"\n{loc}/all #{ln()}: {url=}\n")
     
     set_links = set()
 
     links = soup.find_all('a')
 
     if v:
-        print(f"\nget.links.all #{get_linenumber()}: {len(links)} links found:\n")
+        print(f"\n{loc}/all #{ln()}: {len(links)} links found:\n")
     for l in links:
         if v:
-            print(f"\nget.links.all #{get_linenumber()}: {l}")
+            print(f"\n{loc}/all #{ln()}: {l}")
             
         try:
             href = l['href']
             if v:
-                print(f"get.links.all #{get_linenumber()}: {type(href)} {href=}")
+                print(f"{loc}/all #{ln()}: {type(href)} {href=}")
             if not any(ele in href for ele in keywords_to_remove):
 
                 if not href.startswith('/'):
@@ -159,18 +171,18 @@ def all(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False)
 
                 set_links.add(link)
                 if v:
-                    print(f"get.links.all #{get_linenumber()}: +++ADDED {link}\n\n")
+                    print(f"{loc}/all #{ln()}: +++ADDED {link}\n\n")
             else:
-                print(f"get.links.all #{get_linenumber()}: ---REMOVED {href} - blacklist\n\n")
+                print(f"{loc}/all #{ln()}: ---REMOVED {href} - blacklist\n\n")
             
         except:
-            print(f"get.links.all #{get_linenumber()}: ------ERROR with {l}\n\n")
+            print(f"{loc}/all #{ln()}: ------ERROR with {l}\n\n")
             continue
 
     list_links = list(set_links)
 
     if v:
-        print(f"\n---\nget.links.all #{get_linenumber()}: \nRETURNED list of ALL links ({len(list_links)}):\n{list_links}.\n---\n")
+        print(f"\n---\n{loc}/all #{ln()}: \nRETURNED list of ALL links ({len(list_links)}):\n{list_links}.\n---\n")
 
     return list_links
 
@@ -187,7 +199,7 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
         url = url[:-1]
 
     if v:
-        print(f"\nget.links.socials #{get_linenumber()}: {url=}\n")
+        print(f"\n{loc}/socials #{ln()}: {url=}\n")
 
     social_names = [
         'twitter',
@@ -208,7 +220,7 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
         try:
             link = l['href']
             # if v:
-            #     print(f"\nget.links.socials #{get_linenumber()}: checking {l}")
+            #     print(f"\n{loc}/socials #{ln()}: checking {l}")
 
             if ("twitter.com" in link) and ("intent" not in link) and ('share' not in link) and ("status" not in link) and ("hashtag" not in link):
                 if v:
@@ -253,7 +265,7 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
             # x = person(first='Nic', last='Deville')
         except:
             if v:
-                print(f"\nget.links.socials #{get_linenumber()}: ------ERROR with {l}\n")
+                print(f"\n{loc}/socials #{ln()}: ------ERROR with {l}\n")
             continue
 
     # Cleanup: None where no value
@@ -276,7 +288,7 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
         socials.tiktok = None
 
     if v:
-        print(f"\n---\nget.links.socials #{get_linenumber()}: NOTE: returns namedtuple of SOCIAL links: {','.join(social_names)}.\n---\n")
+        print(f"\n---\n{loc}/socials #{ln()}: NOTE: returns namedtuple of SOCIAL links: {','.join(social_names)}.\n---\n")
 
     return socials
 
@@ -313,7 +325,7 @@ def files(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fals
         url = url[:-1]
 
     if v:
-        print(f"\nget.links #{get_linenumber()}: {url=}\n")
+        print(f"\nget.links #{ln()}: {url=}\n")
     
     set_links = set()
 
@@ -328,7 +340,7 @@ def files(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fals
 
     for l in links:
         # if v:
-        #     print(f"\n#{get_linenumber()}: {l}")
+        #     print(f"\n#{ln()}: {l}")
             
         try:
             href = l['href']
@@ -356,7 +368,7 @@ def files(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fals
     list_links = list(set_links)
 
     if v:
-        print(f"\n---\nget.links.files #{get_linenumber()}: \nRETURNED list of all FILES links ({len(list_links)}):\n{list_links}.\n---\n")
+        print(f"\n---\n{loc}/files #{ln()}: \nRETURNED list of all FILES links ({len(list_links)}):\n{list_links}.\n---\n")
 
     return list_links
 

@@ -2,6 +2,9 @@
 
 ### Supporting Functions
 
+# script name
+loc = "get/logo"
+
 
 ### MAIN
 
