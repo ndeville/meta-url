@@ -23,8 +23,13 @@ def ln():
 ### MAIN
 
 def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
-    # global add_keywords_to_remove
-    # keywords_to_remove = keywords_to_remove + add_keywords_to_remove
+    
+    # Add default keywords to remove if no keywords are passed
+    if len(keywords_to_remove) == 0:
+        keywords_to_remove = [
+            'Google',
+            'Facebook',
+        ]
 
     soup = soup_tuple.soup
     url = soup_tuple.url
@@ -52,7 +57,12 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
             if v:
                 print(f"{ent.text} ➤ {ent.label_}")
                 print()
-            list_orgs.append(ent.text)
+            org_name = ent.text
+            if '\n' in org_name:
+                org_name = org_name.replace('\n',' ')
+            org_name = org_name.strip()
+            if not any(ele in org_name for ele in keywords_to_remove):
+                list_orgs.append(org_name)
 
     # root_name = domain_name_from_url(url)
 
@@ -60,11 +70,13 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
     #     org_name = process.extractOne(root_name, list_orgs)[0]
     # else:
     #     org_name = None
-        
+    
+    list_orgs = sorted(set(list_orgs))
+
     if v:
         print(f"\nget.name #{ln()} f: {list_orgs=}")
     
-    return list_orgs
+    return list_orgs # returns list
     
 
     # text = soup.get_text()

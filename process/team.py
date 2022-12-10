@@ -20,10 +20,9 @@ def ln(): # print line numbers with f"{ln()}"
 
 def generate_email(email_pattern,first,last,v=False):
     if v:
-        print(f"generating email:")
-        print(f"\n{loc} #{ln()}: email_pattern: {email_pattern}")
-        print(f"{loc} #{ln()}: first: {first}")
-        print(f"{loc} #{ln()}: last: {last}")
+        print(f"{loc} #{ln()} generate_email: email_pattern: {email_pattern}")
+        print(f"{loc} #{ln()} generate_email: first: {first}")
+        print(f"{loc} #{ln()} generate_email: last: {last}")
 
     first = first.lower()
     last = last.lower()

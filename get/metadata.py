@@ -65,32 +65,39 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
         # Name tags
 
-        if 'name' in tag.attrs.keys() and tag.attrs['name'].strip().lower() == 'keywords':
-            keywords = tag.attrs['content']
-            if v:
-                print (f'{loc} #{ln()}: CONTENT NAME :',tag.attrs['content'])
+        if 'name' in tag.attrs.keys():
 
-        if 'name' in tag.attrs.keys() and tag.attrs['name'].strip().lower() == 'description':
-            description = tag.attrs['content']
-            if v:
-                print (f'{loc} #{ln()}: CONTENT NAME :',tag.attrs['content'])
+            if tag.attrs['name'].strip().lower() == 'keywords':
+                keywords = tag.attrs['content']
+                if v:
+                    print (f'{loc} #{ln()}: CONTENT NAME :',tag.attrs['content'])
+
+            if tag.attrs['name'].strip().lower() == 'description':
+                try:
+                    description = tag.attrs['content']
+                    if v:
+                        print (f'{loc} #{ln()}: CONTENT NAME :',tag.attrs['content'])
+                except:
+                    continue
 
         # Property tags
 
-        if 'property' in tag.attrs.keys() and tag.attrs['property'].strip().lower() == 'og:title':
-            og_title = tag.attrs['content']
-            if v:
-                print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
+        if 'property' in tag.attrs.keys():
 
-        if 'property' in tag.attrs.keys() and tag.attrs['property'].strip().lower() == 'og:site_name':
-            site_name = tag.attrs['content']
-            if v:
-                print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
+            if tag.attrs['property'].strip().lower() == 'og:title':
+                og_title = tag.attrs['content']
+                if v:
+                    print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
 
-        if 'property' in tag.attrs.keys() and tag.attrs['property'].strip().lower() == 'og:description':
-            og_description = tag.attrs['content']
-            if v:
-                print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
+            if tag.attrs['property'].strip().lower() == 'og:site_name':
+                site_name = tag.attrs['content']
+                if v:
+                    print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
+
+            if tag.attrs['property'].strip().lower() == 'og:description':
+                og_description = tag.attrs['content']
+                if v:
+                    print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
 
     if v:
         print(f"\nChoosing between og_title and page_title for title:")

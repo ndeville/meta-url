@@ -1,11 +1,11 @@
 # get.emails
 
 import re
-
-### Supporting Functions
-
+import tldextract
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
+
+### Supporting Functions
 
 # script name
 loc = "get/emails"
@@ -19,14 +19,33 @@ def ln():
     cf = currentframe()
     return cf.f_back.f_lineno
 
+def get_domain_from_url(url):
+    o = tldextract.extract(url)
+    domain = f"{o.domain}.{o.suffix}".lower()
+    if 'www.' in domain:
+        domain = domain.replace('www.','')
+    return domain
+
 ### MAIN
 
 ### NOTE
 ### use mailto: tag + regex to get emails
 
 add_keywords_to_remove = [
-    'dataprotection',
-]
+    'career', 
+    'compliance', 
+    'dataprotection', 
+    'datenschutz', 
+    'dpo', 
+    'gdpr', 
+    'invest', 
+    'legal', 
+    'media', 
+    'press', 
+    'privacy',
+    'security',
+    'unsubscribe',
+    ]
 
 def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
     global add_keywords_to_remove
@@ -36,9 +55,10 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
     url = soup_tuple.url
     if url.endswith('/'):
         url = url[:-1]
+    domain = get_domain_from_url(url)
 
     if v:
-        print(f"\n---\n{loc} #{ln()}: parsing {url}")
+        print(f"\n---\n{loc} #{ln()}: parsing {url} with domain {domain}\n")
 
     set_emails = set() # start with set to avoid duplicates
 
@@ -54,8 +74,16 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
     if len(matches) > 0:
         for match in matches:
-            if not any(ele in match for ele in add_keywords_to_remove):
-                set_emails.add(match.strip().lower())
+            match = match.strip().lower()
+            parts = match.split('@')
+            email_prefix = parts[0]
+            email_domain = parts[1]
+            if not any(ele in email_prefix for ele in add_keywords_to_remove):
+                if domain in email_domain:
+                    email = f"{parts[0]}@{domain}"
+                    set_emails.add(email)
+                    if v:
+                        print(f"ADDED {email} to set_emails on {url}")
 
     # with mailto: tag / NECESSARY?
 

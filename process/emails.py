@@ -7,6 +7,14 @@ emails: return a list of emails not assigned to team / add to separate table in 
 from collections import namedtuple
 from inspect import currentframe
 
+
+# GLOBAL
+
+list_generic_email_prefixes = [
+    'hello',
+]
+
+
 # Supporting functions
 
 # script name
@@ -64,6 +72,27 @@ def email_to_pattern(email,first_name,last_name,v=False):
 
     return email_pattern
 
+def clean_email(email, v=False):
+    if v:
+        print(f"\n---\np{loc} #{ln()} cleaning email: {email}")
+
+    email = email.strip()
+
+    keywords_to_remove = [
+        '/',
+    ]
+
+    for k in keywords_to_remove:
+        if k in email:
+            email = email.replace(k, "")
+
+    if v:
+        print(f"\n---\np{loc} #{ln()} returning name: {email}")
+
+    email = email.strip()
+
+    return email
+
 # MAIN
 
 def main(emails, team, domain, v=False, test=False):
@@ -87,39 +116,44 @@ def main(emails, team, domain, v=False, test=False):
         if v:
             print(f"\n{loc} #{ln()}: processing {em}")
         
+        em = clean_email(em, v=v)
+
         email_prefix = em.split('@')[0].lower()
 
         for person,person_url in team.items():
             first_name = person.split(' ')[0].lower()
             last_name = person.split(' ')[1].lower()
-            if last_name in email_prefix:
-                if v:
-                    print(f"{loc} #{ln()}: {last_name} matches {email_prefix}")
-                emails_dict[em] = {
-                    'type': 'person',
-                    'person': person,
-                    'src': url,
-                    }
-            elif first_name == email_prefix:
-                if v:
-                    print(f"{loc} #{ln()}: {first_name} matches {email_prefix}")
-                emails_dict[em] = {
-                    'type': 'person',
-                    'person': person,
-                    'src': url,
-                    }
+            if first_name not in [None, ''] and last_name not in [None, '']:
+                if last_name in email_prefix:
+                    if v:
+                        print(f"{loc} #{ln()}: last_name {last_name} matches {email_prefix}")
+                    emails_dict[em] = {
+                        'type': 'person',
+                        'person': person,
+                        'src': url,
+                        }
+                elif first_name == email_prefix:
+                    if v:
+                        print(f"{loc} #{ln()}: first_name {first_name} matches {email_prefix}")
+                    emails_dict[em] = {
+                        'type': 'person',
+                        'person': person,
+                        'src': url,
+                        }
 
     # Add missing emails
 
     list_emails_remaining = [x for x in emails if x not in [email for email,v in emails_dict.items()]]
-
-    list_generic_email_prefixes = []
 
     new_team = team
     if v:
         print(f"\n{loc} #{ln()}: new_team: {new_team}")
 
     for email_remaining in list_emails_remaining:
+
+        email_remaining = clean_email(email_remaining, v=v)
+
+
         email_pref = email_remaining.split('@')[0].lower()
         if email_pref.lower() in list_generic_email_prefixes:
             emails_dict[email_remaining] = {
@@ -130,7 +164,12 @@ def main(emails, team, domain, v=False, test=False):
 
         elif '.' in email_pref:
             new_person = email_pref.replace('.',' ').title()
-            new_team.append(new_person)
+            new_team[new_person] = {
+                'email': email_remaining,
+                'first': new_person.split(' ')[0],
+                'last': new_person.split(' ')[1],
+                'src': url,
+                }
             emails_dict[email_remaining] = {
                 'type': 'person',
                 'person': new_person,
@@ -151,14 +190,14 @@ def main(emails, team, domain, v=False, test=False):
     ### Email Patterns
 
     list_email_patterns = []
-    for email,v in emails_dict.items():
-        if v['type'] == 'person':
+    for email,values in emails_dict.items():
+        if values['type'] == 'person':
             # email_prefix = email.split('@')[0].lower()
-            name = v['person'].lower()
+            name = values['person'].lower()
             first_name = name.split(' ')[0]
             last_name = name.split(' ')[1]
 
-            email_pattern = email_to_pattern(email,first_name,last_name,v=True)
+            email_pattern = email_to_pattern(email,first_name,last_name,v=v)
 
             if email_pattern not in [None, '']:
                 list_email_patterns.append(email_pattern)

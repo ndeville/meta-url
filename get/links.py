@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 
 # print(f"\n{os.path.basename(__file__)} loaded -----------\n")
 
@@ -47,7 +48,7 @@ import tldextract
 #         domain = domain.replace('www.','')
 #     return domain
 
-def domain_name_from_url(url):
+def root_domain_name_from_url(url):
     # import tldextract
     o = tldextract.extract(url)
     domain_name = o.domain.lower()
@@ -55,6 +56,12 @@ def domain_name_from_url(url):
         domain_name = domain_name.replace('www.','')
     return domain_name
 
+def clean_long_url(long_url):
+    o = urlparse(long_url)
+    cleaned = f"{o.scheme}://{o.netloc}{o.path}"
+    if cleaned.endswith('/'):
+        cleaned = cleaned[:-1]
+    return cleaned
 
 
 def internal(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
@@ -70,7 +77,7 @@ def internal(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=F
         print()
         print(f"{loc}.internal #{ln()}: {url=}")
 
-    domain_name = domain_name_from_url(url)
+    domain_name = root_domain_name_from_url(url)
     if v: 
         print(f"{loc}.internal #{ln()}: domain_name: {domain_name}")
     
@@ -79,6 +86,12 @@ def internal(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=F
 
     links = soup.find_all('a')
 
+    startswith_include = (
+        '/',
+        ':/',
+        '://',
+    )
+
     if v:
         print(f"\n{loc}.internal #{ln()}: {len(links)} links found:\n")
     for l in links:
@@ -86,14 +99,24 @@ def internal(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=F
         #     print(f"\n{loc}.internal #{ln()}: {l}")
             
         try:
-            href = l['href']
+            href = clean_long_url(l['href'])
             if v:
                 print(f"{loc}.internal #{ln()}: {type(href)} {href=}")
             if not any(ele in href for ele in keywords_to_remove):
 
                 if domain_name in href and not href.startswith('/') and not href.startswith('mailto'): # NOT if href startswith as some links will be on a different (sub)domain
                     link = href.strip()
-                    set_links.add(link)
+                    if '#' not in link:
+                        set_links.add(link)
+                    if v:
+                        print(f"{loc}.internal #{ln()}: ADDED {link}")
+                elif href.startswith(startswith_include):
+                    link = href.strip()
+                    if '#' not in link:
+                        for start in startswith_include:
+                            if link.startswith(start):
+                                link = link.replace(start, f"{clean_long_url(url)}")
+                        set_links.add(link)
                     if v:
                         print(f"{loc}.internal #{ln()}: ADDED {link}")
                 # add mailto links to separate dict
@@ -108,9 +131,10 @@ def internal(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=F
 
                 if href.startswith('/'):
                     link = f"{url}{href.strip()}"
-                    set_links.add(link)
-                    if v:
-                        print(f"{loc}.internal #{ln()}: ADDED {link}")
+                    if '#' not in link:
+                        set_links.add(link)
+                        if v:
+                            print(f"{loc}.internal #{ln()}: ADDED {link}")
             else:
                 if v:
                     print(f"{loc}.internal #{ln()}: REMOVED {href} - blacklist")
@@ -158,7 +182,7 @@ def all(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False)
             print(f"\n{loc}/all #{ln()}: {l}")
             
         try:
-            href = l['href']
+            href = clean_long_url(l['href'])
             if v:
                 print(f"{loc}/all #{ln()}: {type(href)} {href=}")
             if not any(ele in href for ele in keywords_to_remove):
@@ -197,6 +221,7 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
     url = soup_tuple.url
     if url.endswith('/'):
         url = url[:-1]
+    domain = root_domain_name_from_url(url)
 
     if v:
         print(f"\n{loc}/socials #{ln()}: {url=}\n")
@@ -218,16 +243,16 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
 
     for l in links:
         try:
-            link = l['href']
+            link = clean_long_url(l['href'])
             # if v:
             #     print(f"\n{loc}/socials #{ln()}: checking {l}")
 
-            if ("twitter.com" in link) and ("intent" not in link) and ('share' not in link) and ("status" not in link) and ("hashtag" not in link):
+            if ("twitter.com" in link) and ("intent" not in link) and ('share' not in link) and ("status" not in link) and ("hashtag" not in link) and domain in link:
                 if v:
                     print(f"+++ADDED TWITTER {link}")
                 socials.twitter = link
 
-            elif ("linkedin.com" in link):
+            elif ("linkedin.com/company" in link):
                 if v:
                     print(f"+++ADDED LINKEDIN {link}")
                 socials.linkedin = link
@@ -292,6 +317,89 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
 
     return socials
 
+### LINKEDINS / All Linkedin links of people (company linkedin available in .linkedin)
+
+def linkedins(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
+
+    soup = soup_tuple.soup
+    url = soup_tuple.url
+    if url.endswith('/'):
+        url = url[:-1]
+
+    if v:
+        print(f"\n{loc}/linkedins #{ln()}: {url=}\n")
+
+    linkedins = {}
+    
+
+    links = soup.find_all('a')
+
+    for l in links:
+        try:
+            link = clean_long_url(l['href'])
+            if v:
+                print(f"\n{loc}/linkedins #{ln()}: checking {link}")
+
+            # if ("linkedin.com" in link) and ('/company/' not in link) and ('/in/' in link):
+            if ("linkedin.com/in/" in link) and link not in linkedins:
+                if v:
+                    print(f"+++ADDED LINKEDIN {link}")
+                linkedins[link] = url
+
+        except:
+            if v:
+                print(f"\n{loc}/linkedins #{ln()}: ------ERROR with {l}\n")
+            continue
+
+    return linkedins
+
+### TWITTERS / All Twitter links of people (company twitter available in .twitter)
+
+def twitters(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
+
+    soup = soup_tuple.soup
+    url = soup_tuple.url
+    if url.endswith('/'):
+        url = url[:-1]
+
+    if v:
+        print(f"\n{loc}/twitters #{ln()}: {url=}\n")
+
+    twitters = {}
+
+    links = soup.find_all('a')
+
+    remove = (
+        '/intent', 
+        '/share', 
+        '/status', 
+        '/hashtag',
+        'privacy',
+        )
+
+    for l in links:
+        try:
+            link = clean_long_url(l['href'])
+            if v:
+                print(f"\n{loc}/twitters #{ln()}: checking {link}")
+
+            # if ("linkedin.com" in link) and ('/company/' not in link) and ('/in/' in link):
+            # if ("twitter.com" in link) and link not in twitters:
+            if "twitter.com" in link: 
+                if not any(ele in link for ele in remove):
+                    if link not in twitters:
+                        if v:
+                            print(f"+++ADDED TWITTER {link}")
+                        twitters[link] = url
+
+        except:
+            if v:
+                print(f"\n{loc}/twitters #{ln()}: ------ERROR with {l}\n")
+            continue
+
+    return twitters
+
+### FILES
 
 def files(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
     global add_keywords_to_remove
@@ -343,7 +451,7 @@ def files(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fals
         #     print(f"\n#{ln()}: {l}")
             
         try:
-            href = l['href']
+            href = clean_long_url(l['href'])
 
             if href.endswith(file_extensions):
                 if not any(ele in href for ele in keywords_to_remove):
