@@ -3,7 +3,7 @@
 ### Supporting Functions
 
 # script name
-loc = "get/logo"
+loc = ">get/logo"
 
 
 ### MAIN

@@ -2,7 +2,7 @@
 
 
 # script name
-loc = "get/countries"
+loc = ">get/countries"
 
 
 # list_countries_ref = list(my_utils.dict_country)

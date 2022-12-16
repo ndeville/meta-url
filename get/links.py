@@ -25,7 +25,7 @@ add_keywords_to_remove = [
 ]
 
 # script name
-loc = "get/links"
+loc = ">get/links"
 
 # get line numbers
 from inspect import currentframe
@@ -87,9 +87,10 @@ def internal(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=F
     links = soup.find_all('a')
 
     startswith_include = (
-        '/',
-        ':/',
         '://',
+        ':/',
+        '//',
+        '/',
     )
 
     if v:
@@ -221,7 +222,7 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
     url = soup_tuple.url
     if url.endswith('/'):
         url = url[:-1]
-    domain = root_domain_name_from_url(url)
+    root_domain_name = root_domain_name_from_url(url).lower()
 
     if v:
         print(f"\n{loc}/socials #{ln()}: {url=}\n")
@@ -236,33 +237,52 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
         'github',
         'tiktok',
     ]
+
+    twitter_blacklist = (
+        'share',
+        'status',
+        'hashtag',
+    )
     
     socials = namedtuple('Socials', social_names)
 
     links = soup.find_all('a')
 
     for l in links:
+        if v:
+            print(f"\n{loc}/socials #{ln()}: {l=}")
         try:
-            link = clean_long_url(l['href'])
-            # if v:
-            #     print(f"\n{loc}/socials #{ln()}: checking {l}")
+            link = l['href'] # keep raw string to identify edge cases like Twitter's 'intent/user?screen_name='. Clean later.
+            
+            if v:
+                print(f"{loc}/socials #{ln()}: {link=}")
 
-            if ("twitter.com" in link) and ("intent" not in link) and ('share' not in link) and ("status" not in link) and ("hashtag" not in link) and domain in link:
-                if v:
-                    print(f"+++ADDED TWITTER {link}")
-                socials.twitter = link
+            
+            if ("twitter.com" in link):
+                # if not any(ele in link for ele in twitter_blacklist) and root_domain_name in link.lower():
+                if not any(ele in link for ele in twitter_blacklist):
+
+                    if 'intent/user?screen_name=' in link:
+                        link = link.replace('intent/user?screen_name=', '')
+                    link = clean_long_url(link)
+                    if v:
+                        print(f"+++ADDED TWITTER {link}")
+                    socials.twitter = link
 
             elif ("linkedin.com/company" in link):
+                link = clean_long_url(link)
                 if v:
                     print(f"+++ADDED LINKEDIN {link}")
                 socials.linkedin = link
 
             elif ("facebook.com" in link) and ("facebook.com/share" not in link):
+                link = clean_long_url(link)
                 if v:
                     print(f"+++ADDED FACEBOOK {link}")
                 socials.facebook = link
 
             elif ("instagram.com" in link):
+                link = clean_long_url(link)
                 if v:
                     print(f"+++ADDED INSTAGRAM {link}")
                 socials.instagram = link

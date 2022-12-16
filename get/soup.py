@@ -22,7 +22,7 @@ driverpath = config['CHROMEDRIVER']
 # Supporting functions
 
 # script name
-loc = f"get/soup"
+loc = f">get/soup"
 
 # get line numbers
 from inspect import currentframe
@@ -44,7 +44,7 @@ def main(url,test=False,v=False):
         print(f"\n{loc} #{ln()} PROTECTED crawling {url}")
 
         if v:
-            print(f"\n{loc} #{ln()}: NOTE: {loc}.main returns a named tuple with .url and .soup\n")
+            print(f"        NOTE: {loc}.main returns a namedtuple with .url and .soup\n")
 
         soup_tuple = namedtuple('soup_dict', ['url', 'soup'])
 

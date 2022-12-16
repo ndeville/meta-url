@@ -1,5 +1,5 @@
 # script name
-loc = "get/metadata"
+loc = ">get/metadata"
 
 from collections import namedtuple
 

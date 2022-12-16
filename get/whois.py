@@ -3,7 +3,7 @@
 ### Supporting Functions
 
 # script name
-loc = f"get/whois"
+loc = f">get/whois"
 
 
 ### MAIN

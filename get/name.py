@@ -3,7 +3,7 @@ import spacy
 # import tldextract
 
 # script name
-loc = "get/name"
+loc = ">get/name"
 
 from inspect import currentframe
 def ln():
@@ -49,14 +49,14 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
     list_orgs = []
     # list_countries_found = []
 
-    if v:
-        print(f"\nents:\n")
+    # if v:
+    #     print(f"\nents:\n")
     for ent in doc.ents:
         label = ent.label_
         if label == 'ORG' or label == 'PRODUCT':
-            if v:
-                print(f"{ent.text} ➤ {ent.label_}")
-                print()
+            # if v:
+            #     print(f"{ent.text} ➤ {ent.label_}")
+            #     print()
             org_name = ent.text
             if '\n' in org_name:
                 org_name = org_name.replace('\n',' ')
@@ -74,7 +74,7 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
     list_orgs = sorted(set(list_orgs))
 
     if v:
-        print(f"\nget.name #{ln()} f: {list_orgs=}")
+        print(f"\n{loc} #{ln()}: {list_orgs=}")
     
     return list_orgs # returns list
     

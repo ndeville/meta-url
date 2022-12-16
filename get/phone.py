@@ -3,7 +3,7 @@
 ### Supporting Functions
 
 # script name
-loc = "get/phone"
+loc = ">get/phone"
 
 ### MAIN
 

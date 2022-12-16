@@ -115,7 +115,7 @@ add_keywords_to_remove = [
 ### Supporting Functions
 
 # script name
-loc = "get/team"
+loc = ">get/team"
 # get line numbers
 from inspect import currentframe
 def ln(): # print line numbers with f"{ln()}"

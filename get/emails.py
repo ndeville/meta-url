@@ -8,7 +8,7 @@ pp = pprint.PrettyPrinter(indent=4)
 ### Supporting Functions
 
 # script name
-loc = "get/emails"
+loc = ">get/emails"
 
 # get line numbers
 from inspect import currentframe
