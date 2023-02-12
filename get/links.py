@@ -87,6 +87,7 @@ def internal(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=F
     links = soup.find_all('a')
 
     startswith_include = (
+        ':///',
         '://',
         ':/',
         '//',
@@ -270,7 +271,7 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
                     socials.twitter = link
 
             elif ("linkedin.com/company" in link):
-                link = clean_long_url(link)
+                # link = clean_long_url(link)
                 if v:
                     print(f"+++ADDED LINKEDIN {link}")
                 socials.linkedin = link

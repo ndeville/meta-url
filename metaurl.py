@@ -634,10 +634,11 @@ def meta(url,root=False,v=False,test=False,return_format=False): # v == verbose
         for d in duplicates:
             print(d)
 
+    # else:
+    #     print(f"{loc} #{ln()}: ERROR: {url} is not a valid URL")
+
     return meta_url
 
-else:
-    print(f"{loc} #{ln()}: ERROR: {url} is not a valid URL")
 
 
 def metadata(url,v=False,test=False,return_format=False):
