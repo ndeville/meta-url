@@ -29,6 +29,7 @@ from get.metadata import main as get_metadata
 from get.name import main as get_name
 from get.soup import main as get_soup
 from get.team import main as get_team
+from get.target_keywords import main as get_target_keywords
 from process.emails import main as process_emails
 from process.team import main as process_team
 from process.name import main as process_name
@@ -139,7 +140,7 @@ def find_new_url(url):
 
 ### MAIN
 
-def meta(url,root=False,v=False,test=False,return_format=False): # v == verbose
+def meta(url,root=False,target_keywords=[],v=False,test=False,return_format=False): # v == verbose
     global list_url_crawled
 
     url = url.strip()
@@ -172,6 +173,7 @@ def meta(url,root=False,v=False,test=False,return_format=False): # v == verbose
         'h1', # str / get.metadata
         'internal_links', # set / get.links.internal
         'keywords', # list / get.metadata
+        'target_keywords', # XXX / get.target_keywords
         'linkedin', # str / from get.links import socials
         'linkedins', # list / from get.links import linkedins
         'logo', # bin / get.logo
@@ -203,6 +205,7 @@ def meta(url,root=False,v=False,test=False,return_format=False): # v == verbose
     internal_links = output_internal_links['internal_links']
     if v:
         print(f"\n{loc} #{ln()} {internal_links=}")
+
     emails = output_internal_links['emails']
     if v:
         print(f"\n{loc} #{ln()} {emails=}")
@@ -362,9 +365,7 @@ def meta(url,root=False,v=False,test=False,return_format=False): # v == verbose
         except:
             print(f"{loc} #{ln()} ERROR with getting {link} soup for emails.")
             continue
-
     # sort
-    # emails = {key: val for key, val in sorted(emails.items(), key = lambda ele: ele[0])}
     emails = OrderedDict(sorted(emails.items()))
     if v:
         print(f"{loc} #{ln()}: emails: {emails}")
@@ -385,6 +386,9 @@ def meta(url,root=False,v=False,test=False,return_format=False): # v == verbose
 
     ### keywords, # list / get.metadata
     keywords = metadata.keywords
+
+    ### target keywords, eg domain name of competitor, # str / from get.target_keywords 
+    target_keywords = get_target_keywords(homepage_soup_tuple,target_keywords=target_keywords,v=v)
 
     ### linkedin, # str / from get.links import socials
     linkedin = socials.linkedin
@@ -579,6 +583,7 @@ def meta(url,root=False,v=False,test=False,return_format=False): # v == verbose
     meta_url.h1 = h1
     meta_url.internal_links = internal_links
     meta_url.keywords = keywords
+    meta_url.target_keywords = target_keywords
     meta_url.linkedin = linkedin
     meta_url.linkedins = linkedins
     meta_url.logo = logo
@@ -641,7 +646,19 @@ def meta(url,root=False,v=False,test=False,return_format=False): # v == verbose
 
 
 
-def metadata(url,v=False,test=False,return_format=False):
+
+
+
+
+
+
+
+
+
+
+# DEF METADATA / root page only
+
+def metadata(url,target_keywords=[],v=False,test=False,return_format=False):
 
     url = url.strip()
     domain = get_domain_from_url(url)
@@ -656,10 +673,14 @@ def metadata(url,v=False,test=False,return_format=False):
             'clean_root_url', # str / inline
             'description', # str / get.metadata
             'domain', # str / inline
+            'emails', # str / inline
             'h1', # str / get.metadata
             'name', # str / get.name
             'slug', # str / inline
             'title', # str / get.metadata
+            'internal_links', # str / get.links.internal
+            'target_keywords', # str / get.target_keywords
+            'linkedin', # str / get.socials
         ]
 
         ## HOMEPAGE ONLY
@@ -667,6 +688,12 @@ def metadata(url,v=False,test=False,return_format=False):
 
         ## Metadata
         metadata = get_metadata(homepage_soup_tuple,v=v)
+
+        ## Internal Links
+        output_internal_links = get_internal_links(homepage_soup_tuple,v=v) # sorted set
+        internal_links = output_internal_links['internal_links']
+        if v:
+            print(f"\n{loc} #{ln()} {internal_links=}")
 
         # # NAMEDTUPLE TO BE RETURNED
         meta_url = namedtuple('metaURL', meta_url_fields)
@@ -688,6 +715,9 @@ def metadata(url,v=False,test=False,return_format=False):
         ### keywords, # list / get.metadata
         keywords = metadata.keywords
 
+        ### target keywords, eg domain name of competitor, # str / from get.target_keywords
+        target_keywords = get_target_keywords(homepage_soup_tuple,target_keywords=target_keywords,v=v)
+
         ### name, # str / get.name
         names = get_name(homepage_soup_tuple,v=v)
         if v:
@@ -696,11 +726,20 @@ def metadata(url,v=False,test=False,return_format=False):
             print(f"\n\n{sep()}{loc} #{ln()}: PROCESSING names with:")
         name = process_name(names, domain, v=v)
 
+        ### emails
+        emails = get_emails(homepage_soup_tuple,v=v)
+
         # ### slug, # str / inline
         slug = get_slug_from_url(url)
     
         ### title, # str / get.metadata
         title = metadata.title
+
+        ### linkedin, # str / from get.links import socials
+        socials = get_social_links(homepage_soup_tuple,v=v)
+        linkedin = socials.linkedin
+        if linkedin not in [None, '']:
+            linkedin = clean_long_url(linkedin)
 
         # CREATE namedtuple
 
@@ -708,11 +747,15 @@ def metadata(url,v=False,test=False,return_format=False):
         meta_url.clean_root_url = clean_root_url
         meta_url.description = description
         meta_url.domain = domain
+        meta_url.emails = emails
         meta_url.h1 = h1
         meta_url.keywords = keywords
+        meta_url.target_keywords = target_keywords
         meta_url.name = name
         meta_url.slug = slug
         meta_url.title = title
+        meta_url.internal_links = internal_links
+        meta_url.linkedin = linkedin
 
 
         if return_format:
@@ -728,6 +771,19 @@ def metadata(url,v=False,test=False,return_format=False):
 
     else:
         print(f"{loc} #{ln()}: ERROR: {url} is not a valid URL")
+
+
+
+
+
+
+
+
+
+
+
+
+# DEF SOCIALS / root page only
 
 ### Socials only
 

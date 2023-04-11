@@ -5,18 +5,20 @@ load_dotenv()
 
 MYIP = os.getenv("MYIP")
 
-def check_ip():
-    global MYIP
-    # try:
-    myip = get('https://api.ipify.org').content.decode('utf8')
-    # except:
-    #     print("check_ip ERROR: Could not get IP")
-    #     return False
+# Move to my_utlils check_my_ip()
 
-    if MYIP == myip:
-        return True
-    else:
-        return False
+# def check_ip():
+#     global MYIP
+#     # try:
+#     myip = get('https://api.ipify.org').content.decode('utf8')
+#     # except:
+#     #     print("check_ip ERROR: Could not get IP")
+#     #     return False
+
+#     if MYIP == myip:
+#         return True
+#     else:
+#         return False
 
 
 

@@ -2,6 +2,10 @@ import spacy
 # from thefuzz import fuzz, process
 # import tldextract
 
+# added 230331 to avoid huggingface/tokenizers error message
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 # script name
 loc = ">get/name"
 

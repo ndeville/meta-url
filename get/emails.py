@@ -2,6 +2,7 @@
 
 import re
 import tldextract
+from bs4 import BeautifulSoup
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -47,6 +48,37 @@ add_keywords_to_remove = [
     'unsubscribe',
     ]
 
+
+
+
+
+# def find_emails_in_html(soup):
+#     # Function to validate email addresses
+#     def is_valid_email(email):
+#         return bool(re.search(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email))
+
+#     # soup = BeautifulSoup(html_text, 'html.parser')
+#     email_list = []
+
+#     # Find emails in mailto: links
+#     mailto_links = soup.find_all(href=re.compile(r"^mailto:"))
+#     for link in mailto_links:
+#         email = link['href'].replace("mailto:", "")
+#         if is_valid_email(email) and email not in email_list:
+#             email_list.append(email)
+
+#     # Find standalone emails in the text
+#     standalone_emails = re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", soup)
+#     for email in standalone_emails:
+#         if is_valid_email(email) and email not in email_list:
+#             email_list.append(email)
+
+#     return email_list
+
+
+
+
+
 def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
     global add_keywords_to_remove
     keywords_to_remove = keywords_to_remove + add_keywords_to_remove
@@ -64,11 +96,19 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
     # with regex
 
-    text = soup.get_text()
+    # text = soup.get_text()
+    text = soup.prettify()
 
-    email_regex= "([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
+    # print(f"\ntext = soup.prettify():\n\n{text}\n\n")
+
+    # email_regex= "([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
+    # email_regex = r"(?:mailto:)?([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
+    email_regex = r"(?:href=\"mailto:)?([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
+
 
     matches = re.findall(email_regex, text)
+    # matches = find_emails_in_html(soup)
+
     if v:
         print(f"\n{loc} #{ln()} matches: {matches}")
 
