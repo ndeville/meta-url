@@ -76,9 +76,12 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
             if 'name' in tag.attrs.keys():
 
                 if tag.attrs['name'].strip().lower() == 'keywords':
-                    keywords = tag.attrs['content']
-                    if v:
-                        print (f'{loc} #{ln()}: CONTENT NAME :',tag.attrs['content'])
+                    try:
+                        keywords = tag.attrs['content']
+                        if v:
+                            print (f'{loc} #{ln()}: CONTENT NAME :',tag.attrs['content'])
+                    except:
+                        continue
 
                 if tag.attrs['name'].strip().lower() == 'description':
                     try:

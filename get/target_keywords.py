@@ -47,7 +47,7 @@ def main(soup_tuple,target_keywords=[],v=False,test=False):
         pattern = fr'(?<=https?://)(?:[a-zA-Z0-9-]*\.)?({re.escape(tk)})(?=[/"\s]?|$)'
         match = regex.findall(pattern, soup_pretty)
         if match:
-            print(f"✅ {loc} {tk} regex found in soup_pretty {url}")
+            # print(f"✅ {loc} {tk} regex found in soup_pretty {url}")
             output.add(tk)
 
 

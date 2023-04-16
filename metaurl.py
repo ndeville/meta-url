@@ -27,7 +27,9 @@ from get.links import twitters as get_twitters
 from get.links import files as get_files_links
 from get.metadata import main as get_metadata
 from get.name import main as get_name
-from get.soup import main as get_soup
+# from get.soup import main as get_soup
+from get.soup import without_js_rendering as get_soup_without_js_rendering
+from get.soup import with_js_rendering as get_soup_with_js_rendering
 from get.team import main as get_team
 from get.target_keywords import main as get_target_keywords
 from process.emails import main as process_emails
@@ -138,9 +140,9 @@ def find_new_url(url):
 
 
 
-### MAIN
+### MAIN FUNCTIONS
 
-def meta(url,root=False,target_keywords=[],v=False,test=False,return_format=False): # v == verbose
+def meta(url,root=False,target_keywords=[],from_domain=True,v=False,test=False,return_format=False,get_name=True): # v == verbose
     global list_url_crawled
 
     url = url.strip()
@@ -198,7 +200,7 @@ def meta(url,root=False,target_keywords=[],v=False,test=False,return_format=Fals
 
     ## HOMEPAGE
 
-    homepage_soup_tuple = get_soup(url,v=v)
+    homepage_soup_tuple = get_soup_without_js_rendering(url,v=v)
     list_url_crawled.append(url)
 
     output_internal_links = get_internal_links(homepage_soup_tuple,v=v) # sorted set
@@ -355,7 +357,7 @@ def meta(url,root=False,target_keywords=[],v=False,test=False,return_format=Fals
             print(f"\n{loc} #{ln()}: crawling {link} for emails")
         try:
             soup_emails = dict_soup_tuples[link]
-            emails_on_page = get_emails(soup_emails,v=v)
+            emails_on_page = get_emails(soup_emails,from_domain=from_domain,v=v)
             if v:
                 print(f"\n{loc} #{ln()} returned emails_on_page: {emails_on_page}")
             if len(emails_on_page) > 0:
@@ -652,14 +654,174 @@ def meta(url,root=False,target_keywords=[],v=False,test=False,return_format=Fals
 
 
 
+# # DEF METADATA / root page only / 230416 UPDATED WITH CLASS
+
+# def metadata(url,target_keywords=[],from_domain=True,v=False,test=False,return_format=False,fetch_name=True):
+
+#     url = url.strip()
+#     domain = get_domain_from_url(url)
+
+#     if url.startswith('http'):
+
+#         if v:
+#             print(f"\n===\nProcessing {url} with domain {domain}\n===\n")
+
+#         meta_url_fields = [
+#             'clean_url',  # str / inline 
+#             'clean_root_url', # str / inline
+#             'description', # str / get.metadata
+#             'domain', # str / inline
+#             'emails', # str / inline
+#             'h1', # str / get.metadata
+#             'name', # str / get.name
+#             'slug', # str / inline
+#             'title', # str / get.metadata
+#             'internal_links', # str / get.links.internal
+#             'target_keywords', # str / get.target_keywords
+#             'linkedin', # str / get.socials
+#         ]
+
+#         # # NAMEDTUPLE TO BE RETURNED
+#         meta_url = namedtuple('metaURL', meta_url_fields)
+
+#         ## HOMEPAGE ONLY
+#         homepage_soup_tuple = get_soup_without_js_rendering(url,v=v)
+
+#         ## Metadata
+#         metadata = get_metadata(homepage_soup_tuple,v=v)
+#         if metadata.title in [None, '']:
+#             homepage_soup_tuple = get_soup_with_js_rendering(url,v=v)
+#             metadata = get_metadata(homepage_soup_tuple,v=v)
+
+#         ## Internal Links
+#         output_internal_links = get_internal_links(homepage_soup_tuple,v=v) # sorted set
+#         internal_links = output_internal_links['internal_links']
+#         if v:
+#             print(f"\n{loc} #{ln()} {internal_links=}")
+
+
+#         # ## NAMEDTUPLE FIELDS
+
+#         # ### clean_url,  # str / inline 
+#         clean_url = clean_long_url(url)
+
+#         # ### clean_root_url, # str / inline
+#         clean_root_url = get_root_url(url)
+
+#         ### description, # returns str from get/metadata
+#         description = metadata.description
+
+#         ### h1, # str / get.metadata
+#         h1 = metadata.h1
+
+#         ### keywords, # list / get.metadata
+#         keywords = metadata.keywords
+
+#         ### target keywords, eg domain name of competitor, # str / from get.target_keywords
+#         if len(target_keywords) == 0:
+#             target_keywords = set()
+#         else:
+#             target_keywords = get_target_keywords(homepage_soup_tuple,target_keywords=target_keywords,v=v)
+
+#         ### name, # str / get.name
+#         if fetch_name:
+#             names = get_name(homepage_soup_tuple,v=v)
+#             if v:
+#                 print(f"\n{loc} #{ln()} returned names_on_page: {names}")
+#             if v:
+#                 print(f"\n\n{sep()}{loc} #{ln()}: PROCESSING names with:")
+#             name = process_name(names, domain, v=v)
+#         else:
+#             name = 'Not returned as fetch_name=False'
+
+#         ### emails
+#         emails = get_emails(homepage_soup_tuple,from_domain=from_domain,v=v)
+
+#         # ### slug, # str / inline
+#         slug = get_slug_from_url(url)
+    
+#         ### title, # str / get.metadata
+#         title = metadata.title
+
+#         ### linkedin, # str / from get.links import socials
+#         socials = get_social_links(homepage_soup_tuple,v=v)
+#         linkedin = socials.linkedin
+#         if linkedin not in [None, '']:
+#             linkedin = clean_long_url(linkedin)
+
+#         # CREATE namedtuple
+
+#         meta_url.clean_url = clean_url
+#         meta_url.clean_root_url = clean_root_url
+#         meta_url.description = description
+#         meta_url.domain = domain
+#         meta_url.emails = emails
+#         meta_url.h1 = h1
+#         meta_url.keywords = keywords
+#         meta_url.target_keywords = target_keywords
+#         meta_url.name = name
+#         meta_url.slug = slug
+#         meta_url.title = title
+#         meta_url.internal_links = internal_links
+#         meta_url.linkedin = linkedin
+
+
+#         if return_format:
+#             print(f"\n\n=====\n{loc} #{ln()}: NOTE: metaURL returns namedtuple with following attributes: {','.join(meta_url_fields)}\n")
+#             print(f"\nCopy/paste the below to print full output:\n---\n")
+
+#             print(f"print(f\"\\n\=====================\nOUTPUT:\\n\")")
+#             for field in meta_url_fields:
+#                 print("print(f\"", f'{field}: ', "{", f'x.{field}', "}", "\\n\")")
+        
+
+#         return meta_url
+
+#     else:
+#         print(f"{loc} #{ln()}: ERROR: {url} is not a valid URL")
+#         return False
 
 
 
 
-# DEF METADATA / root page only
 
-def metadata(url,target_keywords=[],v=False,test=False,return_format=False):
 
+class MetaURL:
+    def __init__(self, clean_url, clean_root_url, description, domain, emails, h1, keywords, target_keywords, name, slug, title, internal_links, linkedin):
+        self.clean_url = clean_url
+        self.clean_root_url = clean_root_url
+        self.description = description
+        self.domain = domain
+        self.emails = emails
+        self.h1 = h1
+        self.keywords = keywords
+        self.target_keywords = target_keywords
+        self.name = name
+        self.slug = slug
+        self.title = title
+        self.internal_links = internal_links
+        self.linkedin = linkedin
+
+    def __str__(self):
+        attributes = [
+            f"clean_url: {self.clean_url}",
+            f"clean_root_url: {self.clean_root_url}",
+            f"description: {self.description}",
+            f"domain: {self.domain}",
+            f"emails: {self.emails}",
+            f"h1: {self.h1}",
+            f"keywords: {self.keywords}",
+            f"target_keywords: {self.target_keywords}",
+            f"name: {self.name}",
+            f"slug: {self.slug}",
+            f"title: {self.title}",
+            f"internal_links: {self.internal_links}",
+            f"linkedin: {self.linkedin}",
+        ]
+        return "\n".join(attributes)
+
+
+def metadata(url, target_keywords=[], from_domain=True, v=False, test=False, fetch_name=True):
     url = url.strip()
     domain = get_domain_from_url(url)
 
@@ -668,26 +830,14 @@ def metadata(url,target_keywords=[],v=False,test=False,return_format=False):
         if v:
             print(f"\n===\nProcessing {url} with domain {domain}\n===\n")
 
-        meta_url_fields = [
-            'clean_url',  # str / inline 
-            'clean_root_url', # str / inline
-            'description', # str / get.metadata
-            'domain', # str / inline
-            'emails', # str / inline
-            'h1', # str / get.metadata
-            'name', # str / get.name
-            'slug', # str / inline
-            'title', # str / get.metadata
-            'internal_links', # str / get.links.internal
-            'target_keywords', # str / get.target_keywords
-            'linkedin', # str / get.socials
-        ]
-
         ## HOMEPAGE ONLY
-        homepage_soup_tuple = get_soup(url,v=v)
+        homepage_soup_tuple = get_soup_without_js_rendering(url,v=v)
 
         ## Metadata
         metadata = get_metadata(homepage_soup_tuple,v=v)
+        if metadata.title in [None, '']:
+            homepage_soup_tuple = get_soup_with_js_rendering(url,v=v)
+            metadata = get_metadata(homepage_soup_tuple,v=v)
 
         ## Internal Links
         output_internal_links = get_internal_links(homepage_soup_tuple,v=v) # sorted set
@@ -695,8 +845,6 @@ def metadata(url,target_keywords=[],v=False,test=False,return_format=False):
         if v:
             print(f"\n{loc} #{ln()} {internal_links=}")
 
-        # # NAMEDTUPLE TO BE RETURNED
-        meta_url = namedtuple('metaURL', meta_url_fields)
 
         # ## NAMEDTUPLE FIELDS
 
@@ -716,18 +864,24 @@ def metadata(url,target_keywords=[],v=False,test=False,return_format=False):
         keywords = metadata.keywords
 
         ### target keywords, eg domain name of competitor, # str / from get.target_keywords
-        target_keywords = get_target_keywords(homepage_soup_tuple,target_keywords=target_keywords,v=v)
+        if len(target_keywords) == 0:
+            target_keywords = set()
+        else:
+            target_keywords = get_target_keywords(homepage_soup_tuple,target_keywords=target_keywords,v=v)
 
         ### name, # str / get.name
-        names = get_name(homepage_soup_tuple,v=v)
-        if v:
-            print(f"\n{loc} #{ln()} returned names_on_page: {names}")
-        if v:
-            print(f"\n\n{sep()}{loc} #{ln()}: PROCESSING names with:")
-        name = process_name(names, domain, v=v)
+        if fetch_name:
+            names = get_name(homepage_soup_tuple,v=v)
+            if v:
+                print(f"\n{loc} #{ln()} returned names_on_page: {names}")
+            if v:
+                print(f"\n\n{sep()}{loc} #{ln()}: PROCESSING names with:")
+            name = process_name(names, domain, v=v)
+        else:
+            name = 'Not returned as fetch_name=False'
 
         ### emails
-        emails = get_emails(homepage_soup_tuple,v=v)
+        emails = get_emails(homepage_soup_tuple,from_domain=from_domain,v=v)
 
         # ### slug, # str / inline
         slug = get_slug_from_url(url)
@@ -741,37 +895,14 @@ def metadata(url,target_keywords=[],v=False,test=False,return_format=False):
         if linkedin not in [None, '']:
             linkedin = clean_long_url(linkedin)
 
-        # CREATE namedtuple
-
-        meta_url.clean_url = clean_url
-        meta_url.clean_root_url = clean_root_url
-        meta_url.description = description
-        meta_url.domain = domain
-        meta_url.emails = emails
-        meta_url.h1 = h1
-        meta_url.keywords = keywords
-        meta_url.target_keywords = target_keywords
-        meta_url.name = name
-        meta_url.slug = slug
-        meta_url.title = title
-        meta_url.internal_links = internal_links
-        meta_url.linkedin = linkedin
-
-
-        if return_format:
-            print(f"\n\n=====\n{loc} #{ln()}: NOTE: metaURL returns namedtuple with following attributes: {','.join(meta_url_fields)}\n")
-            print(f"\nCopy/paste the below to print full output:\n---\n")
-
-            print(f"print(f\"\\n\=====================\nOUTPUT:\\n\")")
-            for field in meta_url_fields:
-                print("print(f\"", f'{field}: ', "{", f'x.{field}', "}", "\\n\")")
-        
+        # CREATE MetaURL instance
+        meta_url = MetaURL(clean_url, clean_root_url, description, domain, emails, h1, keywords, target_keywords, name, slug, title, internal_links, linkedin)
 
         return meta_url
 
     else:
         print(f"{loc} #{ln()}: ERROR: {url} is not a valid URL")
-
+        return False
 
 
 
@@ -787,8 +918,96 @@ def metadata(url,target_keywords=[],v=False,test=False,return_format=False):
 
 ### Socials only
 
-def socials(url,root=True,v=False,test=False,return_format=False):
 
+
+
+
+
+# def socials(url,root=True,v=False,test=False,return_format=False):
+
+#     url = url.strip()
+#     domain = get_domain_from_url(url)
+
+#     # if long URL is passed (sub-page) and root == True passed as argument, start from homepage.
+#     if root == True:
+#         url = clean_url(url)
+
+#     if url.startswith('http'):
+
+#         if v:
+#             print(f"\n===\nProcessing Socials for  {url} with domain {domain}\n===\n")
+
+#         url_socials_fields = [
+#             'facebook', # str / from get.links import socials
+#             'instagram', # str / from get.links import socials
+#             'linkedin', # str / from get.links import socials
+#             'medium', # str / from get.links import socials
+#             'tiktok', # str / from get.links import socials
+#             'twitter', # list / from get.links import socials
+#             'youtube', # str / from get.links import socials
+#         ]
+
+#         # # NAMEDTUPLE TO BE RETURNED
+#         url_socials = namedtuple('metaURL', url_socials_fields)
+
+#         ## HOMEPAGE ONLY
+#         homepage_soup_tuple = get_soup_without_js_rendering(url,v=v)
+
+#         ## Socials
+#         socials = get_social_links(homepage_soup_tuple,v=v)
+#         if socials.twitter in [None, '']:
+#             homepage_soup_tuple = get_soup_with_js_rendering(url,v=v)
+#             socials = get_metadata(homepage_soup_tuple,v=v)
+
+#         # CREATE namedtuple
+
+#         url_socials.facebook = socials.facebook
+#         url_socials.instagram = socials.instagram
+#         url_socials.linkedin = socials.linkedin
+#         url_socials.medium = socials.medium
+#         url_socials.tiktok = socials.tiktok
+#         url_socials.twitter = socials.twitter
+#         url_socials.youtube = socials.youtube
+
+#         if return_format:
+#             print(f"\n\n=====\n{loc} #{ln()}: NOTE: metaURL returns namedtuple with following attributes: {','.join(url_socials_fields)}\n")
+#             print(f"\nCopy/paste the below to print full output:\n---\n")
+
+#             print(f"print(f\"\\n\=====================\nOUTPUT:\\n\")")
+#             for field in url_socials_fields:
+#                 print("print(f\"", f'{field}: ', "{", f'x.{field}', "}", "\\n\")")
+        
+
+#         return url_socials
+
+#     else:
+#         print(f"{loc} #{ln()}: ERROR: {url} is not a valid URL")
+
+
+
+class URLSocials:
+    def __init__(self, facebook, instagram, linkedin, medium, tiktok, twitter, youtube):
+        self.facebook = facebook
+        self.instagram = instagram
+        self.linkedin = linkedin
+        self.medium = medium
+        self.tiktok = tiktok
+        self.twitter = twitter
+        self.youtube = youtube
+
+    def __str__(self):
+        attributes = [
+            f"facebook: {self.facebook}",
+            f"instagram: {self.instagram}",
+            f"linkedin: {self.linkedin}",
+            f"medium: {self.medium}",
+            f"tiktok: {self.tiktok}",
+            f"twitter: {self.twitter}",
+            f"youtube: {self.youtube}",
+        ]
+        return "\n".join(attributes)
+
+def socials(url, root=True, v=False, test=False, return_format=False):
     url = url.strip()
     domain = get_domain_from_url(url)
 
@@ -815,31 +1034,23 @@ def socials(url,root=True,v=False,test=False,return_format=False):
         url_socials = namedtuple('metaURL', url_socials_fields)
 
         ## HOMEPAGE ONLY
-        homepage_soup_tuple = get_soup(url,v=v)
+        homepage_soup_tuple = get_soup_without_js_rendering(url,v=v)
 
         ## Socials
         socials = get_social_links(homepage_soup_tuple,v=v)
+        if socials.twitter in [None, '']:
+            homepage_soup_tuple = get_soup_with_js_rendering(url,v=v)
+            socials = get_metadata(homepage_soup_tuple,v=v)
 
-        # CREATE namedtuple
+    # CREATE URLSocials instance
+    url_socials = URLSocials(socials.facebook, socials.instagram, socials.linkedin, socials.medium, socials.tiktok, socials.twitter, socials.youtube)
 
-        url_socials.facebook = socials.facebook
-        url_socials.instagram = socials.instagram
-        url_socials.linkedin = socials.linkedin
-        url_socials.medium = socials.medium
-        url_socials.tiktok = socials.tiktok
-        url_socials.twitter = socials.twitter
-        url_socials.youtube = socials.youtube
+    if return_format:
+        print(f"\n\n=====\n{loc} #{ln()}: NOTE: URLSocials returns class instance with following attributes: {','.join(url_socials_fields)}\n")
+        print(f"\nCopy/paste the below to print full output:\n---\n")
 
-        if return_format:
-            print(f"\n\n=====\n{loc} #{ln()}: NOTE: metaURL returns namedtuple with following attributes: {','.join(url_socials_fields)}\n")
-            print(f"\nCopy/paste the below to print full output:\n---\n")
+        print(f"print(f\"\\n\=====================\nOUTPUT:\\n\")")
+        for field in url_socials_fields:
+            print("print(f\"", f'{field}: ', "{", f'x.{field}', "}", "\\n\")")
 
-            print(f"print(f\"\\n\=====================\nOUTPUT:\\n\")")
-            for field in url_socials_fields:
-                print("print(f\"", f'{field}: ', "{", f'x.{field}', "}", "\\n\")")
-        
-
-        return url_socials
-
-    else:
-        print(f"{loc} #{ln()}: ERROR: {url} is not a valid URL")
+    return url_socials

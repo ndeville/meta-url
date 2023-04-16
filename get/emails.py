@@ -46,11 +46,22 @@ add_keywords_to_remove = [
     'privacy',
     'security',
     'unsubscribe',
+    'noreply',
+    'no-reply',
+    'no_reply',
+    'ne-pas-',
+    'spam',
+    'react',
     ]
 
-
-
-
+false_extensions = (
+    'pdf',
+    'doc',
+    'docx',
+    'png',
+    'jpg',
+    'jpeg',
+)
 
 # def find_emails_in_html(soup):
 #     # Function to validate email addresses
@@ -79,7 +90,7 @@ add_keywords_to_remove = [
 
 
 
-def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
+def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],from_domain=True,v=False,test=False):
     global add_keywords_to_remove
     keywords_to_remove = keywords_to_remove + add_keywords_to_remove
 
@@ -103,8 +114,8 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
     # email_regex= "([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
     # email_regex = r"(?:mailto:)?([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
-    email_regex = r"(?:href=\"mailto:)?([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
-
+    # email_regex = r"(?:href=\"mailto:)?([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)" ## WORKING
+    email_regex = r"(?:href=\"mailto:)?([a-zA-Z0-9_.+-]+(?:@|\(at\))[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
 
     matches = re.findall(email_regex, text)
     # matches = find_emails_in_html(soup)
@@ -114,16 +125,28 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
     if len(matches) > 0:
         for match in matches:
-            match = match.strip().lower()
-            parts = match.split('@')
+            if '(at)' in match:
+                match = match.replace('(at)','@')
+            if v:
+                print(type(match), match)
+            email = match.strip().lower()
+            parts = email.split('@')
             email_prefix = parts[0]
             email_domain = parts[1]
-            if not any(ele in email_prefix for ele in add_keywords_to_remove):
-                if domain in email_domain:
-                    email = f"{parts[0]}@{domain}"
+            if not any(ele in email_prefix for ele in keywords_to_remove) and not email.endswith(false_extensions):
+                if from_domain: # get only emails from the same domain
+                    if domain in email_domain:
+                        # email = f"{parts[0]}@{domain}"
+                        set_emails.add(email)
+                        # if v:
+                        #     print(f"ℹ️  ADDED {email} to set_emails on {url}")
+                    else:
+                        if v:
+                            print(f"ℹ️  SKIPPED {email} with domain {email_domain}")
+                else:
                     set_emails.add(email)
-                    if v:
-                        print(f"ADDED {email} to set_emails on {url}")
+                    # if v:
+                    #     print(f"ℹ️  ADDED {email} to set_emails on {url}")
 
     # with mailto: tag / NECESSARY?
 
@@ -150,14 +173,16 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
     # sorted_list_people_found = sorted(set_emails)
 
-    if v:
-        print(f"\n{loc} #{ln()} dict_emails_to_return: {dict_emails_to_return}")
-        pp.pprint(dict_emails_to_return)
+    # if v:
+    #     print(f"\n{loc} #{ln()} dict_emails_to_return: {dict_emails_to_return}")
+    #     pp.pprint(dict_emails_to_return)
 
     # list_emails = list(set_emails).sort()
     # dict_emails_to_return = sorted(dict_emails_to_return)
 
     if v and len(dict_emails_to_return) > 0:
-        print(f"\n---\n{loc} #{ln()}: \nRETURNED dict of all EMAILS from {url} ({len(dict_emails_to_return)}):\n{dict_emails_to_return}.\n---\n")
+        print(f"\n---\n{loc} #{ln()}: \nRETURNED dict of all EMAILS from {url} ({len(dict_emails_to_return)}):")
+        pp.pprint(dict_emails_to_return)
+        print("---\n")
 
     return dict_emails_to_return

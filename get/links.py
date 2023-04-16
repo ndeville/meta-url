@@ -40,16 +40,7 @@ def ln():
 # domain utils
 import tldextract
 
-# def domain_from_url(url):
-    
-#     o = tldextract.extract(url)
-#     domain = f"{o.domain}.{o.suffix}".lower()
-#     if 'www.' in domain:
-#         domain = domain.replace('www.','')
-#     return domain
-
 def root_domain_name_from_url(url):
-    # import tldextract
     o = tldextract.extract(url)
     domain_name = o.domain.lower()
     if 'www.' in domain_name:
@@ -64,14 +55,17 @@ def clean_long_url(long_url):
     return cleaned
 
 
+
+
+# MAIN FUNCTIONS
+
+
 def internal(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
     global add_keywords_to_remove
     keywords_to_remove = keywords_to_remove + add_keywords_to_remove
 
     soup = soup_tuple.soup
     url = soup_tuple.url
-    if url.endswith('/'):
-        url = url[:-1]
 
     if v:
         print()
@@ -157,6 +151,9 @@ def internal(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=F
 
 
 
+
+
+
 def all(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
     global add_keywords_to_remove
     keywords_to_remove = keywords_to_remove + add_keywords_to_remove
@@ -167,8 +164,6 @@ def all(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False)
 
     soup = soup_tuple.soup
     url = soup_tuple.url
-    if url.endswith('/'):
-        url = url[:-1]
 
     if v:
         print(f"\n{loc}/all #{ln()}: {url=}\n")
@@ -213,6 +208,11 @@ def all(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False)
     return list_links
 
 
+
+
+
+
+
 def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
     global add_keywords_to_remove
     keywords_to_remove = keywords_to_remove + add_keywords_to_remove
@@ -221,8 +221,7 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
 
     soup = soup_tuple.soup
     url = soup_tuple.url
-    if url.endswith('/'):
-        url = url[:-1]
+
     root_domain_name = root_domain_name_from_url(url).lower()
 
     if v:
@@ -270,7 +269,7 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
                         print(f"+++ADDED TWITTER {link}")
                     socials.twitter = link
 
-            elif ("linkedin.com/company" in link):
+            elif ("linkedin.com/company" in link) or ("linkedin.com/school" in link):
                 # link = clean_long_url(link)
                 if v:
                     print(f"+++ADDED LINKEDIN {link}")
@@ -338,6 +337,10 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
 
     return socials
 
+
+
+
+
 ### LINKEDINS / All Linkedin links of people (company linkedin available in .linkedin)
 
 def linkedins(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False):
@@ -373,6 +376,11 @@ def linkedins(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=
             continue
 
     return linkedins
+
+
+
+
+
 
 ### TWITTERS / All Twitter links of people (company twitter available in .twitter)
 
@@ -419,6 +427,11 @@ def twitters(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=F
             continue
 
     return twitters
+
+
+
+
+
 
 ### FILES
 
@@ -500,6 +513,12 @@ def files(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fals
         print(f"\n---\n{loc}/files #{ln()}: \nRETURNED list of all FILES links ({len(list_links)}):\n{list_links}.\n---\n")
 
     return list_links
+
+
+
+
+
+
 
 ########################################################################################################
 
