@@ -804,6 +804,7 @@ class MetaURL:
 
     def __str__(self):
         attributes = [
+            f"\nmetaurl.metadata output:"
             f"clean_url: {self.clean_url}",
             f"clean_root_url: {self.clean_root_url}",
             f"description: {self.description}",
@@ -1054,3 +1055,18 @@ def socials(url, root=True, v=False, test=False, return_format=False):
             print("print(f\"", f'{field}: ', "{", f'x.{field}', "}", "\\n\")")
 
     return url_socials
+
+
+
+
+
+
+
+########################################################################################################
+
+if __name__ == '__main__':
+    
+    # test = metadata('https://meetings.informs.org/wordpress/healthcare2023/submit')
+    test = metadata('https://techbeatconference.com/')
+
+    print(test)

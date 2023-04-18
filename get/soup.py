@@ -105,28 +105,133 @@ def ln():
 
 
 
-# 230414-0735 New function (ScrapingAnt) / WITHOUT JS rendering == 1 credit
+# # 230414-0735 New function (ScrapingAnt) / WITHOUT JS rendering == 1 credit
 
-def without_js_rendering(url,test=False,v=False):
+# def without_js_rendering(url,test=False,v=False):
 
-    soup_tuple = namedtuple('soup_dict', ['url', 'soup'])
+#     soup_tuple = namedtuple('soup_dict', ['url', 'soup'])
 
+#     request_url = 'https://api.scrapingant.com/v2/general'
+
+#     # First try with browser=False, 1 credit, no JS rendering
+#     params = {
+#         'url': url,
+#         'x-api-key': SCRAPINGANT_API_KEY,
+#         'browser': False, # WITHOUT JS rendering / 1 credit
+#         'proxy_country': 'GB', # default: world
+#         'return_page_source': True, # default: False
+#     }
+
+#     response = requests.get(request_url, params=params)
+
+#     if response.status_code == 404:
+
+#         print(f"⚠️ ❗️ ScrapingAnt says Error {response.status_code}: {response.reason}")
+
+#     # if response.status_code >= 400:
+#     elif response.status_code in [400, 403, 405, 409, 422, 423, 500]:
+
+#         print(f"⚠️ ❗️ ScrapingAnt says Error {response.status_code}: {response.reason}")
+
+#         my_utils.wait(5)
+
+#         response = requests.get(request_url, params=params)
+
+#         if response.status_code >= 400:
+
+#             print(f"⚠️ ❗️ 2nd try, ScrapingAnt says Error {response.status_code}: {response.reason}")
+
+#     html_text = response.text
+
+#     if v:
+#         print(f"from {loc}: {html_text}")
+
+#     soup = BeautifulSoup(html_text, 'html.parser')
+
+#     if url.endswith('/'):
+#         url = url[:-1]
+
+#     output = soup_tuple(url=url, soup=soup)
+
+#     return output
+
+
+
+# # WITH JS rendering == 10 credits
+
+# def with_js_rendering(url,test=False,v=False):
+
+#     print(f"ℹ️  Trying again with JS rendering (10 credits) as no Title returned in first try.")
+
+#     soup_tuple = namedtuple('soup_dict', ['url', 'soup'])
+
+#     request_url = 'https://api.scrapingant.com/v2/general'
+
+#     # First try with browser=False, 1 credit, no JS rendering
+#     params = {
+#         'url': url,
+#         'x-api-key': SCRAPINGANT_API_KEY,
+#         'browser': True, # WITH JS rendering / 10 credits
+#         'proxy_country': 'GB', # default: world
+#         'return_page_source': True, # default: False
+#     }
+
+#     response = requests.get(request_url, params=params)
+
+#     # if response.status_code == 404:
+
+#     #     print(f"⚠️ ❗️ ScrapingAnt says Error {response.status_code}: {response.reason}")
+
+#     if response.status_code in [400, 403, 404, 405, 409, 422, 423, 500]:
+
+#         print(f"⚠️ ❗️ ScrapingAnt says Error {response.status_code}: {response.reason}")
+
+#     html_text = response.text
+
+#     if v:
+#         print(f"from {loc}: {html_text}")
+
+#     soup = BeautifulSoup(html_text, 'html.parser')
+
+#     if url.endswith('/'):
+#         url = url[:-1]
+
+#     output = soup_tuple(url=url, soup=soup)
+
+#     return output
+
+
+
+
+
+# 230416 ChatGPT optimised
+
+class SoupTuple:
+    def __init__(self, url, soup):
+        self.url = url
+        self.soup = soup
+
+def fetch_soup(url, with_js=False, test=False, v=False):
     request_url = 'https://api.scrapingant.com/v2/general'
 
-    # First try with browser=False, 1 credit, no JS rendering
     params = {
         'url': url,
         'x-api-key': SCRAPINGANT_API_KEY,
-        'browser': False, # WITHOUT JS rendering / 1 credit
-        'proxy_country': 'GB', # default: world
-        'return_page_source': True, # default: False
+        'browser': with_js,  # Set to True for JS rendering (10 credits), False otherwise (1 credit)
+        'proxy_country': 'GB',
+        'return_page_source': True,
     }
 
     response = requests.get(request_url, params=params)
 
+    # if response.status_code in [400, 403, 404, 405, 409, 422, 423, 500]:
     if response.status_code >= 400:
-
         print(f"⚠️ ❗️ ScrapingAnt says Error {response.status_code}: {response.reason}")
+        if response.status_code != 404:
+            my_utils.wait(5)
+            response = requests.get(request_url, params=params)
+            if response.status_code >= 400:
+                print(f"⚠️ ❗️ 2nd try, ScrapingAnt says Error {response.status_code}: {response.reason}")
 
     html_text = response.text
 
@@ -138,50 +243,20 @@ def without_js_rendering(url,test=False,v=False):
     if url.endswith('/'):
         url = url[:-1]
 
-    output = soup_tuple(url=url, soup=soup)
+    output = SoupTuple(url=url, soup=soup)
 
     return output
 
+def without_js_rendering(url, test=False, v=False):
+    return fetch_soup(url, with_js=False, test=test, v=v)
 
-
-# WITH JS rendering == 10 credits
-
-def with_js_rendering(url,test=False,v=False):
-
+def with_js_rendering(url, test=False, v=False):
     print(f"ℹ️  Trying again with JS rendering (10 credits) as no Title returned in first try.")
+    return fetch_soup(url, with_js=True, test=test, v=v)
 
-    soup_tuple = namedtuple('soup_dict', ['url', 'soup'])
 
-    request_url = 'https://api.scrapingant.com/v2/general'
 
-    # First try with browser=False, 1 credit, no JS rendering
-    params = {
-        'url': url,
-        'x-api-key': SCRAPINGANT_API_KEY,
-        'browser': True, # WITH JS rendering / 10 credits
-        'proxy_country': 'GB', # default: world
-        'return_page_source': True, # default: False
-    }
 
-    response = requests.get(request_url, params=params)
-
-    if response.status_code >= 400:
-
-        print(f"⚠️ ❗️ ScrapingAnt says Error {response.status_code}: {response.reason}")
-
-    html_text = response.text
-
-    if v:
-        print(f"from {loc}: {html_text}")
-
-    soup = BeautifulSoup(html_text, 'html.parser')
-
-    if url.endswith('/'):
-        url = url[:-1]
-
-    output = soup_tuple(url=url, soup=soup)
-
-    return output
 
 
 

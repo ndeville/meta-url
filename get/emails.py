@@ -3,6 +3,16 @@
 import re
 import tldextract
 from bs4 import BeautifulSoup
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
+PROJECTS_FOLDER = os.getenv("PROJECTS_FOLDER")
+
+import sys
+sys.path.append(f"{PROJECTS_FOLDER}/indeXee")
+import my_utils
+
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -105,20 +115,14 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],from_domain=True,v
 
     set_emails = set() # start with set to avoid duplicates
 
-    # with regex
+    # With regex
 
-    # text = soup.get_text()
     text = soup.prettify()
 
-    # print(f"\ntext = soup.prettify():\n\n{text}\n\n")
-
-    # email_regex= "([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
-    # email_regex = r"(?:mailto:)?([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
     # email_regex = r"(?:href=\"mailto:)?([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)" ## WORKING
     email_regex = r"(?:href=\"mailto:)?([a-zA-Z0-9_.+-]+(?:@|\(at\))[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
 
     matches = re.findall(email_regex, text)
-    # matches = find_emails_in_html(soup)
 
     if v:
         print(f"\n{loc} #{ln()} matches: {matches}")
@@ -136,17 +140,22 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],from_domain=True,v
             if not any(ele in email_prefix for ele in keywords_to_remove) and not email.endswith(false_extensions):
                 if from_domain: # get only emails from the same domain
                     if domain in email_domain:
-                        # email = f"{parts[0]}@{domain}"
-                        set_emails.add(email)
-                        # if v:
-                        #     print(f"ℹ️  ADDED {email} to set_emails on {url}")
+
+                        # VALIDATE EMAIL FORMAT using my_utils
+                        valid_email = my_utils.validate_email_format(email)
+
+                        # Validate function returns cleaned up email if typo, else False if non-valid format
+                        if valid_email != False:
+                            set_emails.add(email)
+                            if v:
+                                print(f"ℹ️  ADDED {email} to set_emails on {url}")
                     else:
                         if v:
                             print(f"ℹ️  SKIPPED {email} with domain {email_domain}")
                 else:
                     set_emails.add(email)
-                    # if v:
-                    #     print(f"ℹ️  ADDED {email} to set_emails on {url}")
+                    if v:
+                        print(f"ℹ️  ADDED {email} to set_emails on {url}")
 
     # with mailto: tag / NECESSARY?
 

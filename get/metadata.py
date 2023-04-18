@@ -71,6 +71,8 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
         for tag in metas:
 
+            # print(f"{tag=}")
+
             # Name tags
 
             if 'name' in tag.attrs.keys():
@@ -95,6 +97,9 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
 
             if 'property' in tag.attrs.keys():
 
+                if v:
+                    print (f'{loc} #{ln()}: PROPERTY TAGS :',tag.attrs['property'])
+
                 if tag.attrs['property'].strip().lower() == 'og:title':
                     og_title = tag.attrs['content']
                     if v:
@@ -105,10 +110,13 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
                     if v:
                         print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
 
-                if tag.attrs['property'].strip().lower() == 'og:description':
-                    og_description = tag.attrs['content']
-                    if v:
-                        print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
+                try:
+                    if tag.attrs['property'].strip().lower() == 'og:description':
+                        og_description = tag.attrs['content']
+                        if v:
+                            print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
+                except:
+                    continue
 
         if v:
             print(f"\nChoosing between og_title and page_title for title:")
