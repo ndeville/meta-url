@@ -100,23 +100,30 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=False
                 if v:
                     print (f'{loc} #{ln()}: PROPERTY TAGS :',tag.attrs['property'])
 
+
                 if tag.attrs['property'].strip().lower() == 'og:title':
-                    og_title = tag.attrs['content']
-                    if v:
-                        print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
+                    try:
+                        og_title = tag.attrs['content']
+                        if v:
+                            print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
+                    except:
+                        continue
 
                 if tag.attrs['property'].strip().lower() == 'og:site_name':
-                    site_name = tag.attrs['content']
-                    if v:
-                        print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
+                    try:
+                        site_name = tag.attrs['content']
+                        if v:
+                            print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
+                    except:
+                        continue
 
-                try:
-                    if tag.attrs['property'].strip().lower() == 'og:description':
+                if tag.attrs['property'].strip().lower() == 'og:description':
+                    try:
                         og_description = tag.attrs['content']
                         if v:
                             print (f'{loc} #{ln()}: CONTENT PROPERTY :',tag.attrs['content'])
-                except:
-                    continue
+                    except:
+                        continue
 
         if v:
             print(f"\nChoosing between og_title and page_title for title:")
