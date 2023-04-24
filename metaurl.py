@@ -1067,6 +1067,6 @@ def socials(url, root=True, v=False, test=False, return_format=False):
 if __name__ == '__main__':
     
     # test = metadata('https://meetings.informs.org/wordpress/healthcare2023/submit')
-    test = metadata('https://techbeatconference.com/')
+    test = metadata('https://ht.acm.org/ht2018')
 
     print(test)

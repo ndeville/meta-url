@@ -1,3 +1,8 @@
+import time
+start_time = time.time()
+
+from datetime import datetime
+
 import os
 
 from dotenv import load_dotenv
@@ -232,6 +237,7 @@ def fetch_soup(url, with_js=False, test=False, v=False):
             response = requests.get(request_url, params=params)
             if response.status_code >= 400:
                 print(f"⚠️ ❗️ 2nd try, ScrapingAnt says Error {response.status_code}: {response.reason}")
+                return False
 
     html_text = response.text
 
@@ -253,10 +259,6 @@ def without_js_rendering(url, test=False, v=False):
 def with_js_rendering(url, test=False, v=False):
     print(f"ℹ️  Trying again with JS rendering (10 credits) as no Title returned in first try.")
     return fetch_soup(url, with_js=True, test=test, v=v)
-
-
-
-
 
 
 
@@ -314,3 +316,27 @@ def with_js_rendering(url, test=False, v=False):
 #         return output
 #     else:
 #         return print(f"⚠️ ❗️ ScrapingAnt Error")
+
+
+
+
+
+########################################################################################################
+
+if __name__ == '__main__':
+    print('\n\n-------------------------------')
+    
+    soup = without_js_rendering('https://allconferencecfpalerts.com/cfp/pages.php?pno=1', v=True)
+    
+    print(soup)
+
+
+    run_time = round((time.time() - start_time), 3)
+    if run_time < 1:
+        print(f'\n{os.path.basename(__file__)} finished in {round(run_time*1000)}ms at {datetime.now().strftime("%H:%M:%S")}.\n')
+    elif run_time < 60:
+        print(f'\n{os.path.basename(__file__)} finished in {round(run_time)}s at {datetime.now().strftime("%H:%M:%S")}.\n')
+    elif run_time < 3600:
+        print(f'\n{os.path.basename(__file__)} finished in {round(run_time/60)}mns at {datetime.now().strftime("%H:%M:%S")}.\n')
+    else:
+        print(f'\n{os.path.basename(__file__)} finished in {round(run_time/3600, 2)}hrs at {datetime.now().strftime("%H:%M:%S")}.\n')

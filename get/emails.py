@@ -145,8 +145,8 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],from_domain=True,v
                         valid_email = my_utils.validate_email_format(email)
 
                         # Validate function returns cleaned up email if typo, else False if non-valid format
-                        if valid_email != False:
-                            set_emails.add(email)
+                        if valid_email not in [False, 'False']:
+                            set_emails.add(valid_email)
                             if v:
                                 print(f"ℹ️  ADDED {email} to set_emails on {url}")
                     else:
