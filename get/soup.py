@@ -326,7 +326,7 @@ def with_js_rendering(url, test=False, v=False):
 if __name__ == '__main__':
     print('\n\n-------------------------------')
     
-    soup = without_js_rendering('https://allconferencecfpalerts.com/cfp/pages.php?pno=1', v=True)
+    soup = without_js_rendering('https://www.eventbrite.com/d/united-kingdom--london/paid--events/conference/?page=1', v=True)
     
     print(soup)
 
