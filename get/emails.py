@@ -42,6 +42,8 @@ def get_domain_from_url(url):
 ### NOTE
 ### use mailto: tag + regex to get emails
 
+blacklist_domains = my_utils.get_blacklist_domains()
+
 add_keywords_to_remove = [
     'career', 
     'compliance', 
@@ -62,6 +64,8 @@ add_keywords_to_remove = [
     'ne-pas-',
     'spam',
     'react',
+    'sentry',
+    'wixpress',
     ]
 
 false_extensions = (
@@ -108,6 +112,7 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],from_domain=True,v
     url = soup_tuple.url
     if url.endswith('/'):
         url = url[:-1]
+
     domain = get_domain_from_url(url)
 
     if v:
@@ -128,6 +133,7 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],from_domain=True,v
         print(f"\n{loc} #{ln()} matches: {matches}")
 
     if len(matches) > 0:
+
         for match in matches:
             if '(at)' in match:
                 match = match.replace('(at)','@')
@@ -137,18 +143,28 @@ def main(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],from_domain=True,v
             parts = email.split('@')
             email_prefix = parts[0]
             email_domain = parts[1]
+
             if not any(ele in email_prefix for ele in keywords_to_remove) and not email.endswith(false_extensions):
+
                 if from_domain: # get only emails from the same domain
+
                     if domain in email_domain:
 
-                        # VALIDATE EMAIL FORMAT using my_utils
-                        valid_email = my_utils.validate_email_format(email)
+                        if email_domain not in blacklist_domains:
 
-                        # Validate function returns cleaned up email if typo, else False if non-valid format
-                        if valid_email not in [False, 'False']:
-                            set_emails.add(valid_email)
+                            # VALIDATE EMAIL FORMAT using my_utils
+                            valid_email = my_utils.validate_email_format(email)
+
+                            # Validate function returns cleaned up email if typo, else False if non-valid format
+                            if valid_email not in [False, 'False']:
+                                set_emails.add(valid_email)
+                                if v:
+                                    print(f"ℹ️  ADDED {email} to set_emails on {url}")
+
+                        else:
                             if v:
-                                print(f"ℹ️  ADDED {email} to set_emails on {url}")
+                                print(f"ℹ️  SKIPPED {email} with domain {email_domain} on {url} because domain is in blacklist_domains")
+
                     else:
                         if v:
                             print(f"ℹ️  SKIPPED {email} with domain {email_domain}")

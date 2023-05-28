@@ -826,7 +826,7 @@ def metadata(url, target_keywords=[], from_domain=True, v=False, test=False, fet
     url = url.strip()
     domain = get_domain_from_url(url)
 
-    if url.startswith('http'):
+    if url.startswith('http') and not url.endswith('.pdf'):
 
         if v:
             print(f"\n===\nProcessing {url} with domain {domain}\n===\n")
