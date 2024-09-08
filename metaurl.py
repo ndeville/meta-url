@@ -787,7 +787,7 @@ def meta(url,root=False,target_keywords=[],from_domain=True,v=False,test=False,r
 
 
 class MetaURL:
-    def __init__(self, clean_url, clean_root_url, description, domain, emails, h1, keywords, target_keywords, name, slug, title, internal_links, linkedin):
+    def __init__(self, clean_url, clean_root_url, description, domain, emails, h1, keywords, target_keywords, name, slug, title, internal_links, linkedin, twitter, youtube):
         self.clean_url = clean_url
         self.clean_root_url = clean_root_url
         self.description = description
@@ -801,6 +801,8 @@ class MetaURL:
         self.title = title
         self.internal_links = internal_links
         self.linkedin = linkedin
+        self.twitter = twitter
+        self.youtube = youtube
 
     def __str__(self):
         attributes = [
@@ -818,6 +820,8 @@ class MetaURL:
             f"title: {self.title}",
             f"internal_links: {self.internal_links}",
             f"linkedin: {self.linkedin}",
+            f"twitter: {self.twitter}",
+            f"youtube: {self.youtube}",
         ]
         return "\n".join(attributes)
 
@@ -895,9 +899,11 @@ def metadata(url, target_keywords=[], from_domain=True, v=False, test=False, fet
         linkedin = socials.linkedin
         if linkedin not in [None, '']:
             linkedin = clean_long_url(linkedin)
+        twitter = socials.twitter
+        youtube = socials.youtube
 
         # CREATE MetaURL instance
-        meta_url = MetaURL(clean_url, clean_root_url, description, domain, emails, h1, keywords, target_keywords, name, slug, title, internal_links, linkedin)
+        meta_url = MetaURL(clean_url, clean_root_url, description, domain, emails, h1, keywords, target_keywords, name, slug, title, internal_links, linkedin, twitter, youtube)
 
         return meta_url
 
@@ -1067,6 +1073,6 @@ def socials(url, root=True, v=False, test=False, return_format=False):
 if __name__ == '__main__':
     
     # test = metadata('https://meetings.informs.org/wordpress/healthcare2023/submit')
-    test = metadata('https://ht.acm.org/ht2018')
+    test = metadata('https://www.videoask.com')
 
     print(test)

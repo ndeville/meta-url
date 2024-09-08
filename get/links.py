@@ -258,7 +258,7 @@ def socials(soup_tuple,keywords_to_remove=[],keywords_to_keep=[],v=False,test=Fa
                 print(f"{loc}/socials #{ln()}: {link=}")
 
             
-            if ("twitter.com" in link):
+            if ("twitter.com" in link) or ("x.com" in link):
                 # if not any(ele in link for ele in twitter_blacklist) and root_domain_name in link.lower():
                 if not any(ele in link for ele in twitter_blacklist):
 
